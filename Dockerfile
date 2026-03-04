@@ -1,23 +1,40 @@
-FROM richarvey/nginx-php-fpm:latest
+FROM php:8.2-fpm
 
+# Install Nginx and dependencies
+RUN apt-get update && apt-get install -y \
+    nginx \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    curl \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy application files
 COPY . .
 
-# Image config
-ENV SKIP_COMPOSER 1
-ENV WEBROOT /var/www/html/public
-ENV PHP_ERRORS_STDERR 1
-ENV RUN_SCRIPTS 1
-ENV REAL_IP_HEADER 1
+# Copy Nginx configuration
+COPY ./conf/nginx/nginx-site.conf /etc/nginx/sites-available/default
 
-# Laravel config
-ENV APP_ENV production
-ENV APP_DEBUG false
-ENV LOG_CHANNEL stderr
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader
 
-# Allow composer to run as root
-ENV COMPOSER_ALLOW_SUPERUSER 1
+# Set permissions
+RUN chown -R www-data:www-data storage bootstrap/cache
+RUN chmod -R 775 storage bootstrap/cache
 
-# Copy custom PHP config
-COPY ./conf/php/php.ini /usr/local/etc/php/conf.d/custom.ini
+# Expose port 10000 (Render's default)
+EXPOSE 10000
+
+# Copy and set permissions for start script
+COPY ./scripts/start.sh /start.sh
+RUN chmod +x /start.sh
 
 CMD ["/start.sh"]
