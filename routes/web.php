@@ -1,5 +1,9 @@
 <?php
 
+Route::get('/test', function() {
+    return 'Laravel is working!';
+});
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GradingCriteriaController;
 use App\Http\Controllers\AssessmentController;
