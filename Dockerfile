@@ -17,4 +17,7 @@ ENV LOG_CHANNEL stderr
 # Allow composer to run as root
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
+# Copy custom PHP config
+COPY ./conf/php/php.ini /usr/local/etc/php/conf.d/custom.ini
+
 CMD ["/start.sh"]
