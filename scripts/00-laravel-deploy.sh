@@ -11,5 +11,11 @@ php artisan route:cache
 echo "Running migrations..."
 php artisan migrate --force
 
-# Set memory limit for PHP CLI
-echo "memory_limit = 256M" > /usr/local/etc/php/conf.d/memory-limit.ini
+echo "Setting permissions..."
+chmod -R 777 /var/www/html/storage
+chmod -R 777 /var/www/html/bootstrap/cache
+
+echo "Starting PHP-FPM..."
+php-fpm -D
+
+echo "Done!"
