@@ -1,6 +1,6 @@
 FROM php:8.2-fpm
 
-# Install Nginx and dependencies
+# Install Nginx and dependencies - ADDED 'zip' and 'libzip-dev'
 RUN apt-get update && apt-get install -y \
     nginx \
     libpng-dev \
@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     curl \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+    libzip-dev \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -23,8 +24,9 @@ COPY . .
 # Copy Nginx configuration
 COPY ./conf/nginx/nginx-site.conf /etc/nginx/sites-available/default
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Install PHP dependencies - ADDED --ignore-platform-req=ext-zip as backup
+RUN composer install --no-dev --optimize-autoloader || \
+    composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-zip
 
 # Set permissions
 RUN chown -R www-data:www-data storage bootstrap/cache
