@@ -18,6 +18,7 @@ class GoogleController extends Controller
     {
         // Get Google user
         $googleUser = Socialite::driver('google')->stateless()->user();
+        //$googleUser = Socialite::driver('google')->user();
 
         // Check if teacher exists by email
         $teacher = Teacher::firstOrCreate(
