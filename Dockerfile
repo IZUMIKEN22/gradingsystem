@@ -10,9 +10,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
     curl \
     libzip-dev \
-    libpq-dev \  # <-- ADD THIS for PostgreSQL
+    libpq-dev \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
-    && docker-php-ext-install pdo_pgsql pgsql  # <-- ADD THIS for PostgreSQL
+    && docker-php-ext-install pdo_pgsql pgsql
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
