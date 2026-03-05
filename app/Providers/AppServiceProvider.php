@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Routing\UrlGenerator;
 use Livewire\Livewire;
 use App\Http\Livewire\GradingComponents;
 
@@ -19,8 +20,13 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
+    public function boot(UrlGenerator $url): void
     {
+        // Force HTTPS in production (for Render)
+        if (env('APP_ENV') === 'production') {
+            $url->forceScheme('https');
+        }
+
         Livewire::component('grading-components', GradingComponents::class);
     }
 }
