@@ -185,7 +185,7 @@
                         <!-- Options -->
                         <div class="py-1">
                             <!-- Full Sheet -->
-                            <a href="{{ route('grades.download.full', $classId) }}"
+                            <a href="{{ route('grades.download.full', ['class_id' => $classId]) }}"
                                 class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-orange-50 transition-colors duration-200 group">
                                 <div
                                     class="w-8 h-8 rounded-lg bg-gradient-to-r from-orange-100 to-red-100 flex items-center justify-center">
@@ -203,7 +203,7 @@
                             </a>
 
                             <!-- Midterm Sheet -->
-                            <a href="{{ route('grades.download.midterm', ['class_id' => $classId, 'period' => 'midterm']) }}"
+                            <a href="{{ route('grades.download.midterm', ['class_id' => $classId]) }}?period=midterm"
                                 class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-orange-50 transition-colors duration-200 group border-t border-gray-100">
                                 <div
                                     class="w-8 h-8 rounded-lg bg-gradient-to-r from-yellow-100 to-amber-100 flex items-center justify-center">
@@ -221,7 +221,7 @@
                             </a>
 
                             <!-- Final Sheet -->
-                            <a href="{{ route('grades.download.final', ['class_id' => $classId, 'period' => 'final']) }}"
+                            <a href="{{ route('grades.download.final', ['class_id' => $classId]) }}?period=final"
                                 class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-orange-50 transition-colors duration-200 group border-t border-gray-100">
                                 <div
                                     class="w-8 h-8 rounded-lg bg-gradient-to-r from-red-100 to-rose-100 flex items-center justify-center">
