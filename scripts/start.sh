@@ -1,5 +1,9 @@
 #!/bin/bash
 echo "========================================"
+echo "Running database migrations..."
+php artisan migrate --force
+
+echo "========================================"
 echo "Starting PHP-FPM..."
 php-fpm -D
 

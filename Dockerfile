@@ -1,6 +1,6 @@
 FROM php:8.2-fpm
 
-# Install Nginx and dependencies - ADDED 'zip' and 'libzip-dev'
+# Install Nginx and dependencies - ADDED PostgreSQL extensions
 RUN apt-get update && apt-get install -y \
     nginx \
     libpng-dev \
@@ -10,7 +10,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
     curl \
     libzip-dev \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+    libpq-dev \  # <-- ADD THIS for PostgreSQL
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
+    && docker-php-ext-install pdo_pgsql pgsql  # <-- ADD THIS for PostgreSQL
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -24,7 +26,7 @@ COPY . .
 # Copy Nginx configuration
 COPY ./conf/nginx/nginx-site.conf /etc/nginx/sites-available/default
 
-# Install PHP dependencies - ADDED --ignore-platform-req=ext-zip as backup
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader || \
     composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-zip
 
