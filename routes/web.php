@@ -137,12 +137,12 @@ Route::middleware('teacherAuth')->group(function () {
         'class_count' => $classes->count(),
         'classes' => $classes->map(function($class) {
             return [
-                'id' => $class->id,
+                'class_id' => $class->class_id, // Use class_id instead of id
                 'subject_code' => $class->subject_code,
                 'subject_description' => $class->subject_description,
             ];
         }),
-        'has_class_1' => \App\Models\ClassModel::find(1) ? 'Yes' : 'No',
+        'has_class_1' => \App\Models\ClassModel::where('class_id', 1)->exists() ? 'Yes' : 'No',
     ];
 });
 });
