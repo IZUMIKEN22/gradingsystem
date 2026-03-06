@@ -288,6 +288,20 @@ class GradingSheetController extends Controller
 
     public function downloadFull($class_id)
     {
+
+    $class = ClassModel::with(['teacher', 'academicYear'])->find($class_id);
+        
+        if (!$class) {
+            return response()->json(['error' => 'Class not found'], 404);
+        }
+        
+        // Check if there are students
+        $students = StudentList::where('class_id', $class_id)->get();
+        
+        if ($students->isEmpty()) {
+            return response()->json(['error' => 'No students found for this class'], 404);
+        }
+        
         $students = StudentList::where('class_id', $class_id)
             ->orderBy('Student_name')
             ->get();

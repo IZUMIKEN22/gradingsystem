@@ -130,4 +130,19 @@ Route::middleware('teacherAuth')->group(function () {
 
     Route::get('/classes/{class}/students', [ClassController::class, 'students'])->name('classes.students');
 
+
+    Route::get('/debug-classes', function() {
+    $classes = \App\Models\ClassModel::all();
+    return [
+        'class_count' => $classes->count(),
+        'classes' => $classes->map(function($class) {
+            return [
+                'id' => $class->id,
+                'subject_code' => $class->subject_code,
+                'subject_description' => $class->subject_description,
+            ];
+        }),
+        'has_class_1' => \App\Models\ClassModel::find(1) ? 'Yes' : 'No',
+    ];
+});
 });
