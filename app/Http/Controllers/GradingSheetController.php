@@ -21,7 +21,7 @@ class GradingSheetController extends Controller
     public function midterm($class_id)
     {
         $students = StudentList::where('class_id', $class_id)
-            ->orderBy('Student_name')
+            ->orderBy('student_name')
             ->get();
 
         foreach ($students as $student) {
@@ -65,7 +65,7 @@ class GradingSheetController extends Controller
     public function final($class_id)
     {
         $students = StudentList::where('class_id', $class_id)
-            ->orderBy('Student_name')
+            ->orderBy('student_name')
             ->get();
 
         foreach ($students as $student) {
@@ -111,7 +111,7 @@ class GradingSheetController extends Controller
     {
         // Fetch students in the class
         $students = StudentList::where('class_id', $class_id)
-            ->orderBy('Student_name')
+            ->orderBy('student_name')
             ->get();
 
         foreach ($students as $student) {
@@ -189,7 +189,7 @@ class GradingSheetController extends Controller
 
             // Check if students exist
             $students = StudentList::where('class_id', $class_id)
-                ->orderBy('Student_name')
+                ->orderBy('student_name')
                 ->get();
             \Log::info('Students found: ' . $students->count());
 
@@ -294,7 +294,7 @@ class GradingSheetController extends Controller
 
             // Check if students exist
             $students = StudentList::where('class_id', $class_id)
-                ->orderBy('Student_name')
+                ->orderBy('student_name')
                 ->get();
             \Log::info('Students found: ' . $students->count());
 
