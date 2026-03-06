@@ -130,19 +130,32 @@ Route::middleware('teacherAuth')->group(function () {
 
     Route::get('/classes/{class}/students', [ClassController::class, 'students'])->name('classes.students');
 
-
-    Route::get('/debug-classes', function() {
-    $classes = \App\Models\ClassModel::all();
+    Route::get('/test-pdf-basic', function() {
+    try {
+        $pdf = PDF::loadHTML('<h1>Test PDF</h1><p>PDF generation is working!</p>');
+        return $pdf->download('test.pdf');
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ], 500);
+    }
+});
+Route::get('/check-students/{class_id}', function($class_id) {
+    $students = \App\Models\StudentList::where('class_id', $class_id)->get();
+    
     return [
-        'class_count' => $classes->count(),
-        'classes' => $classes->map(function($class) {
+        'class_id' => $class_id,
+        'student_count' => $students->count(),
+        'has_students' => $students->isNotEmpty(),
+        'students' => $students->map(function($student) {
             return [
-                'class_id' => $class->class_id, // Use class_id instead of id
-                'subject_code' => $class->subject_code,
-                'subject_description' => $class->subject_description,
+                'id' => $student->id,
+                'name' => $student->Student_name,
+                'number' => $student->Student_number
             ];
-        }),
-        'has_class_1' => \App\Models\ClassModel::where('class_id', 1)->exists() ? 'Yes' : 'No',
+        })
     ];
 });
 });

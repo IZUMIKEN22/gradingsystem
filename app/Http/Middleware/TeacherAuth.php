@@ -22,4 +22,6 @@ class TeacherAuth
     return $next($request);
 }
 
+
+
 }
