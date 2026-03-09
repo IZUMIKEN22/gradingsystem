@@ -115,7 +115,7 @@
                                 </div>
                             </div>
 
-                            <!-- Admin Login Form -->
+                            <!-- Admin Login Form - JS Verification Only -->
                             <form id="adminLoginForm" class="space-y-4" onsubmit="return handleAdminLogin(event)">
                                 @csrf
 
@@ -344,9 +344,14 @@
                     if (remember) {
                         sessionStorage.setItem('admin_authenticated', 'true');
                         sessionStorage.setItem('admin_email', email);
+                        sessionStorage.setItem('admin_remember', 'true');
                     } else {
                         sessionStorage.setItem('admin_authenticated', 'true');
+                        sessionStorage.setItem('admin_email', email);
                     }
+                    
+                    // Also set a cookie for additional persistence (optional)
+                    document.cookie = "admin_authenticated=true; path=/";
                     
                     // Reset button state
                     submitBtn.disabled = false;
@@ -397,15 +402,28 @@
         
         // Check if already authenticated
         function checkAuth() {
+            // Check sessionStorage
             if (sessionStorage.getItem('admin_authenticated') === 'true') {
                 // Redirect to admin dashboard if already logged in
                 window.location.href = '/admin/dashboard';
+                return true;
             }
+            
+            // Check cookie as backup
+            if (document.cookie.includes('admin_authenticated=true')) {
+                window.location.href = '/admin/dashboard';
+                return true;
+            }
+            
+            return false;
         }
         
         // Run check on page load
         document.addEventListener('DOMContentLoaded', function() {
-            checkAuth();
+            // Don't auto-redirect if we're already on the login page
+            if (!window.location.pathname.includes('/admin/login')) {
+                checkAuth();
+            }
             
             // Add input event listeners to remove error styling
             document.getElementById('email').addEventListener('input', function() {
@@ -421,10 +439,19 @@
         
         // Prevent form submission on enter key
         document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && document.activeElement.tagName !== 'BUTTON') {
                 e.preventDefault();
                 handleAdminLogin(e);
             }
         });
+        
+        // Clear auth on logout (if you add a logout button)
+        function logout() {
+            sessionStorage.removeItem('admin_authenticated');
+            sessionStorage.removeItem('admin_email');
+            sessionStorage.removeItem('admin_remember');
+            document.cookie = "admin_authenticated=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            window.location.href = '/admin/login';
+        }
     </script>
 @endsection
