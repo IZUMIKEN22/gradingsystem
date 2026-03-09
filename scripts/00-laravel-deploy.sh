@@ -14,6 +14,9 @@ php artisan view:cache
 echo "Running migrations..."
 php artisan migrate --force
 
+echo "Running seeders..."  # ADD THIS
+php artisan db:seed --force  # ADD THIS
+
 echo "Setting permissions..."
 chmod -R 777 storage
 chmod -R 777 bootstrap/cache
