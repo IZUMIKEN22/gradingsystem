@@ -38,6 +38,26 @@ Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 
 /*
 |--------------------------------------------------------------------------
+| Admin Routes - Place these OUTSIDE teacher middleware
+|--------------------------------------------------------------------------
+*/
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Admin login routes - public
+    Route::get('/login', [App\Http\Controllers\Admin\AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [App\Http\Controllers\Admin\AuthController::class, 'login']);
+    
+    // Protected Admin Routes
+    Route::middleware(['admin'])->group(function () {
+        Route::post('/logout', [App\Http\Controllers\Admin\AuthController::class, 'logout'])->name('logout');
+        Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/teachers/{id}', [App\Http\Controllers\Admin\DashboardController::class, 'teacherDetails'])->name('teacher.details');
+        Route::post('/teachers/{id}/status', [App\Http\Controllers\Admin\DashboardController::class, 'updateTeacherStatus'])->name('teacher.status');
+        // Add other admin routes here
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
 | Protected teacher routes
 |--------------------------------------------------------------------------
 */
@@ -129,33 +149,4 @@ Route::middleware('teacherAuth')->group(function () {
     Route::delete('/settings/blocks/{id}', [TeacherController::class, 'destroyBlock'])->name('settings.blocks.destroy');
 
     Route::get('/classes/{class}/students', [ClassController::class, 'students'])->name('classes.students');
-
-    Route::get('/test-pdf-basic', function() {
-    try {
-        $pdf = PDF::loadHTML('<h1>Test PDF</h1><p>PDF generation is working!</p>');
-        return $pdf->download('test.pdf');
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine()
-        ], 500);
-    }
-});
-Route::get('/check-students/{class_id}', function($class_id) {
-    $students = \App\Models\StudentList::where('class_id', $class_id)->get();
-    
-    return [
-        'class_id' => $class_id,
-        'student_count' => $students->count(),
-        'has_students' => $students->isNotEmpty(),
-        'students' => $students->map(function($student) {
-            return [
-                'id' => $student->id,
-                'name' => $student->Student_name,
-                'number' => $student->Student_number
-            ];
-        })
-    ];
-});
 });

@@ -37,7 +37,7 @@
         <div class="w-full max-w-5xl mx-auto px-4 py-4 relative z-10">
             <!-- Main Card - More Compact -->
             <div
-                class="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20 animate-slide-up max-h-[90vh]">
+                class="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20 animate-slide-up">
                 <div class="grid md:grid-cols-2 gap-0 min-h-[550px]">
 
                     <!-- Left Side - Compact Branding -->
@@ -79,7 +79,7 @@
                     </div>
 
                     <!-- Right Side - Login Form -->
-                    <div class="p-8 flex flex-col justify-center">
+                    <div class="p-8 flex flex-col justify-between min-h-[550px]">
                         <div class="max-w-sm mx-auto w-full">
                             <!-- Header -->
                             <div class="mb-6 text-center">
@@ -173,10 +173,9 @@
                                 </div>
                             </div>
 
-                            <!-- Google Button - Moved Below Form -->
+                            <!-- Google Button -->
                             <div class="flex justify-center mb-4">
                                 <div class="w-full">
-                                    <!-- Google Sign In -->
                                     <a href="/auth/google"
                                         class="flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-200 group">
                                         <svg class="w-5 h-5" viewBox="0 0 24 24">
@@ -194,8 +193,8 @@
                                 </div>
                             </div>
 
-                            <!-- Register Link - Now inline as simple link -->
-                            <div class="mt-6 text-center">
+                            <!-- Register Link -->
+                            <div class="text-center">
                                 <div class="flex items-center justify-center gap-2">
                                     <p class="text-sm text-gray-600">Don't have an account?</p>
                                     <a href="/register"
@@ -205,164 +204,81 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Admin Access - Placed at the bottom -->
+                        <div class="text-center mt-auto pt-6 border-t border-gray-200">
+                            <a href="{{ route('admin.login') }}" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-indigo-600 transition-colors group">
+                                <i class="fas fa-shield-alt group-hover:scale-110 transition-transform"></i>
+                                <span>Administrator Access</span>
+                                <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Enhanced Animations & Styles -->
+    <!-- Animations & Styles -->
     <style>
         /* Blob Animation */
         @keyframes blob {
-
-            0%,
-            100% {
-                transform: translate(0px, 0px) scale(1);
-            }
-
-            33% {
-                transform: translate(30px, -50px) scale(1.1);
-            }
-
-            66% {
-                transform: translate(-20px, 20px) scale(0.9);
-            }
+            0%, 100% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
         }
-
-        .animate-blob {
-            animation: blob 7s infinite;
-        }
-
-        .animation-delay-2000 {
-            animation-delay: 2s;
-        }
-
-        .animation-delay-4000 {
-            animation-delay: 4s;
-        }
+        .animate-blob { animation: blob 7s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
 
         /* Float Animation */
         @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0px) rotate(0deg);
-            }
-
-            50% {
-                transform: translateY(-20px) rotate(5deg);
-            }
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
         }
-
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .animation-delay-1000 {
-            animation-delay: 1s;
-        }
-
-        .animation-delay-3000 {
-            animation-delay: 3s;
-        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animation-delay-1000 { animation-delay: 1s; }
+        .animation-delay-3000 { animation-delay: 3s; }
 
         /* Fade In Animation */
         @keyframes fade-in {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .animate-fade-in {
-            animation: fade-in 0.8s ease-out;
-        }
+        .animate-fade-in { animation: fade-in 0.8s ease-out; }
 
         /* Slide Up Animation */
         @keyframes slide-up {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .animate-slide-up {
-            animation: slide-up 0.8s ease-out 0.2s both;
-        }
+        .animate-slide-up { animation: slide-up 0.8s ease-out 0.2s both; }
 
         /* Shake Animation */
         @keyframes shake {
-
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-
-            10%,
-            30%,
-            50%,
-            70%,
-            90% {
-                transform: translateX(-5px);
-            }
-
-            20%,
-            40%,
-            60%,
-            80% {
-                transform: translateX(5px);
-            }
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
-
-        .animate-shake {
-            animation: shake 0.5s ease-out;
-        }
+        .animate-shake { animation: shake 0.5s ease-out; }
 
         /* Pulse Once Animation */
         @keyframes pulse-once {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.8;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
         }
+        .animate-pulse-once { animation: pulse-once 0.6s ease-out; }
 
-        .animate-pulse-once {
-            animation: pulse-once 0.6s ease-out;
-        }
-
-        /* New Animations */
+        /* Pulse Slow Animation */
         @keyframes pulse-slow {
-
-            0%,
-            100% {
-                opacity: 0.3;
-                transform: scale(1);
-            }
-
-            50% {
-                opacity: 0.4;
-                transform: scale(1.05);
-            }
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.05); }
         }
+        .animate-pulse-slow { animation: pulse-slow 4s ease-in-out infinite; }
 
-        .animate-pulse-slow {
-            animation: pulse-slow 4s ease-in-out infinite;
+        /* Ripple Animation */
+        @keyframes ripple {
+            to { transform: scale(4); opacity: 0; }
         }
 
         /* Enhanced focus states */
@@ -380,16 +296,13 @@
         ::-webkit-scrollbar {
             width: 8px;
         }
-
         ::-webkit-scrollbar-track {
             background: rgba(255, 255, 255, 0.1);
         }
-
         ::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.3);
             border-radius: 4px;
         }
-
         ::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.5);
         }
@@ -399,28 +312,19 @@
             .grid.md\:grid-cols-2 {
                 grid-template-columns: 1fr;
             }
-
             .min-h-[550px] {
                 min-height: auto;
             }
-
-            .max-h-[90vh] {
-                max-height: none;
-                margin: 1rem;
-            }
-
             .text-6xl {
                 font-size: 3rem;
             }
-
             .text-5xl {
                 font-size: 2.5rem;
             }
         }
 
         /* Make it fit screen */
-        html,
-        body {
+        html, body {
             height: 100%;
             overflow: hidden;
         }
@@ -503,17 +407,17 @@
                 const y = e.clientY - rect.top - size / 2;
 
                 ripple.style.cssText = `
-                position: absolute;
-                width: ${size}px;
-                height: ${size}px;
-                left: ${x}px;
-                top: ${y}px;
-                background: rgba(59, 130, 246, 0.2);
-                border-radius: 50%;
-                transform: scale(0);
-                animation: ripple 0.6s ease-out;
-                pointer-events: none;
-            `;
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: rgba(59, 130, 246, 0.2);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s ease-out;
+                    pointer-events: none;
+                `;
 
                 this.style.position = 'relative';
                 this.style.overflow = 'hidden';
@@ -523,13 +427,4 @@
             });
         });
     </script>
-
-    <style>
-        @keyframes ripple {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-    </style>
 @endsection
