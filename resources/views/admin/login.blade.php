@@ -99,27 +99,24 @@
                                 <p class="text-gray-600">Secure access for administrators</p>
                             </div>
 
-                            <!-- Alerts -->
-                            @if(session('error'))
-                                <div class="mb-4 p-3 bg-red-50 border-l-4 border-red-500 rounded-r-lg animate-shake">
-                                    <div class="flex items-start">
-                                        <i class="fas fa-exclamation-circle text-red-500 mr-2 mt-0.5"></i>
-                                        <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
-                                    </div>
+                            <!-- Error Alert (hidden by default) -->
+                            <div id="errorAlert" class="hidden mb-4 p-3 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+                                <div class="flex items-start">
+                                    <i class="fas fa-exclamation-circle text-red-500 mr-2 mt-0.5"></i>
+                                    <p id="errorMessage" class="text-sm font-medium text-red-800">Invalid credentials</p>
                                 </div>
-                            @endif
+                            </div>
 
-                            @if($errors->any())
-                                <div class="mb-4 p-3 bg-red-50 border-l-4 border-red-500 rounded-r-lg animate-shake">
-                                    <div class="flex items-start">
-                                        <i class="fas fa-exclamation-circle text-red-500 mr-2 mt-0.5"></i>
-                                        <p class="text-sm font-medium text-red-800">{{ $errors->first() }}</p>
-                                    </div>
+                            <!-- Success Alert (hidden by default) -->
+                            <div id="successAlert" class="hidden mb-4 p-3 bg-green-50 border-l-4 border-green-500 rounded-r-lg">
+                                <div class="flex items-start">
+                                    <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                                    <p id="successMessage" class="text-sm font-medium text-green-800">Login successful! Redirecting...</p>
                                 </div>
-                            @endif
+                            </div>
 
                             <!-- Admin Login Form -->
-                            <form method="POST" action="{{ route('admin.login') }}" class="space-y-4">
+                            <form id="adminLoginForm" class="space-y-4" onsubmit="return handleAdminLogin(event)">
                                 @csrf
 
                                 <!-- Email Field -->
@@ -132,7 +129,7 @@
                                             <i
                                                 class="fas fa-envelope text-gray-400 group-focus-within:text-indigo-500 transition-colors duration-200"></i>
                                         </div>
-                                        <input type="email" name="email" value="{{ old('email') }}"
+                                        <input type="email" id="email" name="email" value="{{ old('email') }}"
                                             class="pl-10 w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white placeholder-gray-400 transition-all duration-200 hover:border-gray-300"
                                             placeholder="admin@example.com" required autofocus>
                                     </div>
@@ -154,7 +151,7 @@
                                             <i
                                                 class="fas fa-lock text-gray-400 group-focus-within:text-indigo-500 transition-colors duration-200"></i>
                                         </div>
-                                        <input type="password" name="password" id="password"
+                                        <input type="password" id="password" name="password"
                                             class="pl-10 pr-10 w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white placeholder-gray-400 transition-all duration-200 hover:border-gray-300"
                                             placeholder="Enter your password" required>
                                         <button type="button" onclick="togglePassword()"
@@ -167,17 +164,17 @@
                                 <!-- Remember Me -->
                                 <div class="flex items-center justify-between">
                                     <label class="flex items-center">
-                                        <input type="checkbox" name="remember" 
+                                        <input type="checkbox" name="remember" id="remember"
                                             class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
                                         <span class="ml-2 text-sm text-gray-600">Remember me</span>
                                     </label>
                                 </div>
 
                                 <!-- Submit Button -->
-                                <button type="submit"
+                                <button type="submit" id="submitBtn"
                                     class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-3 focus:ring-indigo-300 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 group mt-2">
                                     <i class="fas fa-sign-in-alt group-hover:scale-110 transition-transform"></i>
-                                    <span>Access Admin Panel</span>
+                                    <span id="btnText">Access Admin Panel</span>
                                 </button>
                             </form>
 
@@ -200,7 +197,7 @@
                                 </a>
                             </div>
 
-                            <!-- Default Credentials Info (Remove in production) -->
+                            <!-- Default Credentials Info -->
                             <div class="mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
                                 <p class="text-xs font-semibold text-gray-500 mb-2">Demo Credentials:</p>
                                 <div class="space-y-1 text-xs text-gray-600">
@@ -215,9 +212,7 @@
         </div>
     </div>
 
-    <!-- Include the same animations from your main login -->
     <style>
-        /* Copy all the animation styles from your main login here */
         @keyframes blob {
             0%, 100% { transform: translate(0px, 0px) scale(1); }
             33% { transform: translate(30px, -50px) scale(1.1); }
@@ -247,13 +242,6 @@
         }
         .animate-slide-up { animation: slide-up 0.8s ease-out 0.2s both; }
         
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-        .animate-shake { animation: shake 0.5s ease-out; }
-        
         @keyframes pulse-slow {
             0%, 100% { opacity: 0.3; transform: scale(1); }
             50% { opacity: 0.4; transform: scale(1.05); }
@@ -270,6 +258,12 @@
     </style>
 
     <script>
+        // Admin credentials (hardcoded for demo)
+        const ADMIN_CREDENTIALS = {
+            email: 'admin@admin.com',
+            password: 'password'
+        };
+
         // Password toggle function
         function togglePassword() {
             const passwordInput = document.getElementById('password');
@@ -294,50 +288,143 @@
             }
         }
 
-        // Form validation
-        document.querySelector('form').addEventListener('submit', function (e) {
-            const email = this.querySelector('input[name="email"]');
-            const password = this.querySelector('input[name="password"]');
-            const submitBtn = this.querySelector('button[type="submit"]');
-            let hasError = false;
-
-            email.classList.remove('border-red-500', 'bg-red-50', 'animate-shake');
-            password.classList.remove('border-red-500', 'bg-red-50', 'animate-shake');
-
-            if (!email.value.trim()) {
-                e.preventDefault();
-                email.classList.add('border-red-500', 'bg-red-50', 'animate-shake');
-                email.focus();
-                hasError = true;
-            } else if (!isValidEmail(email.value.trim())) {
-                e.preventDefault();
-                email.classList.add('border-red-500', 'bg-red-50', 'animate-shake');
-                email.focus();
-                hasError = true;
+        // Handle admin login
+        function handleAdminLogin(event) {
+            event.preventDefault();
+            
+            // Get form values
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const remember = document.getElementById('remember').checked;
+            
+            // Get alert elements
+            const errorAlert = document.getElementById('errorAlert');
+            const successAlert = document.getElementById('successAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            
+            // Hide any previous alerts
+            errorAlert.classList.add('hidden');
+            successAlert.classList.add('hidden');
+            
+            // Remove any previous error styling
+            document.getElementById('email').classList.remove('border-red-500', 'bg-red-50');
+            document.getElementById('password').classList.remove('border-red-500', 'bg-red-50');
+            
+            // Validate email format
+            if (!isValidEmail(email)) {
+                showError('Please enter a valid email address');
+                document.getElementById('email').classList.add('border-red-500', 'bg-red-50');
+                document.getElementById('email').focus();
+                return false;
             }
-
-            if (!password.value.trim()) {
-                e.preventDefault();
-                password.classList.add('border-red-500', 'bg-red-50', 'animate-shake');
-                if (!hasError) password.focus();
-                hasError = true;
+            
+            // Validate password not empty
+            if (!password) {
+                showError('Password is required');
+                document.getElementById('password').classList.add('border-red-500', 'bg-red-50');
+                document.getElementById('password').focus();
+                return false;
             }
-
-            if (!hasError && !submitBtn.disabled) {
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i><span>Accessing...</span>';
-                submitBtn.disabled = true;
-                submitBtn.classList.add('opacity-90', 'cursor-not-allowed');
-            }
-        });
-
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            btnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Verifying...';
+            submitBtn.classList.add('opacity-90', 'cursor-not-allowed');
+            
+            // Simulate network delay (remove in production)
+            setTimeout(() => {
+                // Check credentials against hardcoded values
+                if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
+                    // Success
+                    successAlert.classList.remove('hidden');
+                    
+                    // Store in sessionStorage if remember me is checked
+                    if (remember) {
+                        sessionStorage.setItem('admin_authenticated', 'true');
+                        sessionStorage.setItem('admin_email', email);
+                    } else {
+                        sessionStorage.setItem('admin_authenticated', 'true');
+                    }
+                    
+                    // Reset button state
+                    submitBtn.disabled = false;
+                    btnText.innerHTML = 'Access Admin Panel';
+                    submitBtn.classList.remove('opacity-90', 'cursor-not-allowed');
+                    
+                    // Redirect to admin dashboard after 1.5 seconds
+                    setTimeout(() => {
+                        window.location.href = '/admin/dashboard';
+                    }, 1500);
+                } else {
+                    // Error
+                    showError('Invalid email or password');
+                    
+                    // Reset button state
+                    submitBtn.disabled = false;
+                    btnText.innerHTML = 'Access Admin Panel';
+                    submitBtn.classList.remove('opacity-90', 'cursor-not-allowed');
+                    
+                    // Shake the form
+                    document.querySelector('.max-w-sm').classList.add('animate-shake');
+                    setTimeout(() => {
+                        document.querySelector('.max-w-sm').classList.remove('animate-shake');
+                    }, 500);
+                }
+            }, 800); // Simulate network delay
+            
+            return false;
+        }
+        
+        // Helper function to show error
+        function showError(message) {
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorAlert.classList.remove('hidden');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                errorAlert.classList.add('hidden');
+            }, 5000);
+        }
+        
+        // Email validation function
         function isValidEmail(email) {
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         }
-
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('input', function () {
-                this.classList.remove('border-red-500', 'bg-red-50', 'animate-shake');
+        
+        // Check if already authenticated
+        function checkAuth() {
+            if (sessionStorage.getItem('admin_authenticated') === 'true') {
+                // Redirect to admin dashboard if already logged in
+                window.location.href = '/admin/dashboard';
+            }
+        }
+        
+        // Run check on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            
+            // Add input event listeners to remove error styling
+            document.getElementById('email').addEventListener('input', function() {
+                this.classList.remove('border-red-500', 'bg-red-50');
+                document.getElementById('errorAlert').classList.add('hidden');
             });
+            
+            document.getElementById('password').addEventListener('input', function() {
+                this.classList.remove('border-red-500', 'bg-red-50');
+                document.getElementById('errorAlert').classList.add('hidden');
+            });
+        });
+        
+        // Prevent form submission on enter key
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                handleAdminLogin(e);
+            }
         });
     </script>
 @endsection
