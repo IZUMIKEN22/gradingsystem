@@ -42,44 +42,26 @@ Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 |--------------------------------------------------------------------------
 */
 Route::prefix('admin')->name('admin.')->group(function () {
-    // API routes for admin dashboard
+    // Your existing routes...
+    
+    // API routes for admin dashboard with active status
     Route::get('/api/teachers', function() {
-        $teachers = App\Models\Teacher::orderBy('created_at', 'desc')->get();
+        $teachers = App\Models\Teacher::orderBy('last_activity', 'desc')->get();
         return response()->json(['teachers' => $teachers]);
     })->name('api.teachers');
     
     Route::get('/api/stats', function() {
+        $now = now();
+        $today = now()->startOfDay();
+        
         return response()->json([
             'total_teachers' => App\Models\Teacher::count(),
-            'active_teachers' => App\Models\Teacher::where('is_active', true)->count(),
-            'inactive_teachers' => App\Models\Teacher::where('is_active', false)->count(),
+            'active_now' => App\Models\Teacher::where('last_activity', '>=', now()->subMinutes(5))->count(),
+            'active_today' => App\Models\Teacher::where('last_activity', '>=', $today)->count(),
             'total_classes' => App\Models\ClassModel::count(),
             'total_students' => App\Models\StudentList::count(),
         ]);
     })->name('api.stats');
-    
-    // Toggle teacher status
-    Route::post('/api/teachers/{id}/toggle-status', function($id) {
-        $teacher = App\Models\Teacher::findOrFail($id);
-        $teacher->is_active = !$teacher->is_active;
-        $teacher->save();
-        
-        return response()->json([
-            'success' => true,
-            'is_active' => $teacher->is_active
-        ]);
-    })->name('api.teachers.toggle');
-    
-    // Delete teacher
-    Route::delete('/api/teachers/{id}', function($id) {
-        $teacher = App\Models\Teacher::findOrFail($id);
-        $teacher->delete();
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Teacher deleted successfully'
-        ]);
-    })->name('api.teachers.delete');
 }); 
 /*
 |--------------------------------------------------------------------------

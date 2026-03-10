@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\TeacherAuth;
 use App\Http\Middleware\AdminAuth;
+use App\Http\Middleware\TrackTeacherActivity;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,9 +14,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function ($middleware) {
+        $middleware->web(append: [
+            TrackTeacherActivity::class,
+        ]);
         $middleware->alias([
             'teacherAuth' => TeacherAuth::class,
             'admin' => AdminAuth::class,
+            'track.activity' => TrackTeacherActivity::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

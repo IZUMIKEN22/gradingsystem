@@ -36,8 +36,8 @@
                 <p class="text-gray-400">You have successfully logged in to the admin panel.</p>
             </div>
 
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Stats Cards - Updated with Active Now -->
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
                 <div class="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
                     <div class="flex items-center justify-between mb-4">
                         <div class="p-3 bg-indigo-600/20 rounded-lg">
@@ -51,11 +51,21 @@
                 <div class="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
                     <div class="flex items-center justify-between mb-4">
                         <div class="p-3 bg-green-600/20 rounded-lg">
-                            <i class="fas fa-user-check text-green-400 text-xl"></i>
+                            <i class="fas fa-circle text-green-400 text-xl animate-pulse"></i>
                         </div>
-                        <span id="activeTeachers" class="text-2xl font-bold text-white">0</span>
+                        <span id="activeNow" class="text-2xl font-bold text-white">0</span>
                     </div>
-                    <h3 class="text-gray-400 text-sm">Active Teachers</h3>
+                    <h3 class="text-gray-400 text-sm">Active Now</h3>
+                </div>
+
+                <div class="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="p-3 bg-blue-600/20 rounded-lg">
+                            <i class="fas fa-clock text-blue-400 text-xl"></i>
+                        </div>
+                        <span id="activeToday" class="text-2xl font-bold text-white">0</span>
+                    </div>
+                    <h3 class="text-gray-400 text-sm">Active Today</h3>
                 </div>
 
                 <div class="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
@@ -83,14 +93,22 @@
             <div class="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden mb-8">
                 <div class="px-6 py-4 border-b border-white/10 flex justify-between items-center">
                     <div>
-                        <h3 class="text-lg font-semibold text-white">Active Teachers</h3>
-                        <p class="text-sm text-gray-400">List of all registered teachers</p>
+                        <h3 class="text-lg font-semibold text-white">Teachers List</h3>
+                        <p class="text-sm text-gray-400">Real-time online status with last activity</p>
                     </div>
-                    <button onclick="refreshTeachers()"
-                        class="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 rounded-lg transition-all duration-200 flex items-center gap-2">
-                        <i class="fas fa-sync-alt"></i>
-                        <span>Refresh</span>
-                    </button>
+                    <div class="flex items-center gap-3">
+                        <span class="flex items-center gap-2 text-xs text-gray-400">
+                            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> Online Now
+                        </span>
+                        <span class="flex items-center gap-2 text-xs text-gray-400">
+                            <span class="w-2 h-2 bg-gray-400 rounded-full"></span> Offline
+                        </span>
+                        <button onclick="refreshTeachers()"
+                            class="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 rounded-lg transition-all duration-200 flex items-center gap-2">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Refresh</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Loading Spinner -->
@@ -105,27 +123,14 @@
                         <table class="min-w-full divide-y divide-white/5">
                             <thead class="bg-white/5">
                                 <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        ID</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Name</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Email</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Username</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Status</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Joined</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Actions</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Email</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Username</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Last Activity</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Joined</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="teachersTableBody" class="divide-y divide-white/5">
@@ -163,6 +168,12 @@
             // Load teachers data
             loadTeachers();
             loadStats();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(() => {
+                loadTeachers();
+                loadStats();
+            }, 30000);
         })();
 
         // Load teachers from API
@@ -211,7 +222,7 @@
             }
         }
 
-        // Render teachers table
+        // Render teachers table with online status
         function renderTeachersTable(teachers) {
             const tbody = document.getElementById('teachersTableBody');
             tbody.innerHTML = '';
@@ -220,13 +231,34 @@
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-white/5 transition-colors';
 
-                // Format date
+                // Format dates
                 const joinedDate = teacher.created_at ? new Date(teacher.created_at).toLocaleDateString() : 'N/A';
+                
+                // Handle last activity
+                let lastActivityText = 'Never';
+                let isOnline = false;
+                
+                if (teacher.last_activity) {
+                    const lastActivity = new Date(teacher.last_activity);
+                    const now = new Date();
+                    const diffMinutes = Math.floor((now - lastActivity) / (1000 * 60));
+                    
+                    // Online if active in last 5 minutes
+                    isOnline = diffMinutes < 5;
+                    
+                    if (diffMinutes < 1) {
+                        lastActivityText = 'Just now';
+                    } else if (diffMinutes < 60) {
+                        lastActivityText = `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''} ago`;
+                    } else {
+                        lastActivityText = lastActivity.toLocaleString();
+                    }
+                }
 
-                // Determine status badge color
-                const statusBadge = teacher.is_active ?
-                    '<span class="px-2 py-1 bg-green-600/20 text-green-400 rounded-full text-xs">Active</span>' :
-                    '<span class="px-2 py-1 bg-gray-600/20 text-gray-400 rounded-full text-xs">Inactive</span>';
+                // Status badge with online indicator
+                const statusBadge = isOnline ?
+                    '<span class="px-2 py-1 bg-green-600/20 text-green-400 rounded-full text-xs flex items-center gap-1"><span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> Online</span>' :
+                    '<span class="px-2 py-1 bg-gray-600/20 text-gray-400 rounded-full text-xs flex items-center gap-1"><span class="w-2 h-2 bg-gray-400 rounded-full"></span> Offline</span>';
 
                 row.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${teacher.id || 'N/A'}</td>
@@ -234,15 +266,13 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${teacher.email || 'N/A'}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${teacher.username || 'N/A'}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${lastActivityText}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${joinedDate}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <button onclick="viewTeacherDetails(${teacher.id})" class="text-indigo-400 hover:text-indigo-300 mr-3">
+                        <button onclick="viewTeacherDetails(${teacher.id})" class="text-indigo-400 hover:text-indigo-300 mr-3" title="View Details">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button onclick="toggleTeacherStatus(${teacher.id})" class="text-yellow-400 hover:text-yellow-300 mr-3">
-                            <i class="fas fa-ban"></i>
-                        </button>
-                        <button onclick="deleteTeacher(${teacher.id})" class="text-red-400 hover:text-red-300">
+                        <button onclick="deleteTeacher(${teacher.id})" class="text-red-400 hover:text-red-300" title="Delete Teacher">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
@@ -266,7 +296,8 @@
                     const data = await response.json();
 
                     document.getElementById('totalTeachers').textContent = data.total_teachers || 0;
-                    document.getElementById('activeTeachers').textContent = data.active_teachers || 0;
+                    document.getElementById('activeNow').textContent = data.active_now || 0;
+                    document.getElementById('activeToday').textContent = data.active_today || 0;
                     document.getElementById('totalClasses').textContent = data.total_classes || 0;
                     document.getElementById('totalStudents').textContent = data.total_students || 0;
                 }
@@ -284,35 +315,6 @@
         // View teacher details
         function viewTeacherDetails(teacherId) {
             window.location.href = `/admin/teachers/${teacherId}`;
-        }
-
-        // Toggle teacher status (activate/deactivate)
-        async function toggleTeacherStatus(teacherId) {
-            if (!confirm('Are you sure you want to change this teacher\'s status?')) {
-                return;
-            }
-
-            try {
-                const response = await fetch(`/api/admin/teachers/${teacherId}/toggle-status`, {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    // Reload teachers to show updated status
-                    loadTeachers();
-                    loadStats();
-                } else {
-                    alert('Failed to update teacher status');
-                }
-            } catch (error) {
-                console.error('Error toggling status:', error);
-                alert('Error updating teacher status');
-            }
         }
 
         // Delete teacher
