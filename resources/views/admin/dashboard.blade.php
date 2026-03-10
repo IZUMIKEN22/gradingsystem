@@ -103,25 +103,14 @@
 </div>
 
 <script>
-    // Display admin email from sessionStorage
-    document.addEventListener('DOMContentLoaded', function() {
-        const adminEmail = sessionStorage.getItem('admin_email') || 'admin@admin.com';
-        document.getElementById('adminEmail').textContent = adminEmail;
-        document.getElementById('adminName').textContent = adminEmail.split('@')[0];
+    // Check authentication before showing dashboard
+    (function() {
+        const isAuthenticated = sessionStorage.getItem('admin_authenticated') === 'true' || 
+                                document.cookie.includes('admin_authenticated=true');
         
-        // Check if authenticated
-        if (!sessionStorage.getItem('admin_authenticated')) {
+        if (!isAuthenticated) {
             window.location.href = '/admin/login';
         }
-    });
-    
-    // Logout function
-    function logout() {
-        sessionStorage.removeItem('admin_authenticated');
-        sessionStorage.removeItem('admin_email');
-        sessionStorage.removeItem('admin_remember');
-        document.cookie = "admin_authenticated=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        window.location.href = '/admin/login';
-    }
+    })();
 </script>
 @endsection

@@ -258,200 +258,223 @@
     </style>
 
     <script>
-        // Admin credentials (hardcoded for demo)
-        const ADMIN_CREDENTIALS = {
-            email: 'admin@admin.com',
-            password: 'password'
-        };
+    // Admin credentials (hardcoded for demo)
+    const ADMIN_CREDENTIALS = {
+        email: 'admin@admin.com',
+        password: 'password'
+    };
 
-        // Password toggle function
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eyeIcon');
+    // Password toggle function
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
 
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.classList.remove('fa-eye');
-                eyeIcon.classList.add('fa-eye-slash');
-                eyeIcon.classList.add('text-indigo-600');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-eye-slash');
+            eyeIcon.classList.add('text-indigo-600');
+            setTimeout(() => {
+                eyeIcon.classList.remove('text-indigo-600');
+            }, 300);
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.classList.remove('fa-eye-slash');
+            eyeIcon.classList.add('fa-eye');
+            eyeIcon.classList.add('text-indigo-600');
+            setTimeout(() => {
+                eyeIcon.classList.remove('text-indigo-600');
+            }, 300);
+        }
+    }
+
+    // Handle admin login
+    function handleAdminLogin(event) {
+        event.preventDefault();
+        
+        // Get form values
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const remember = document.getElementById('remember').checked;
+        
+        // Get alert elements
+        const errorAlert = document.getElementById('errorAlert');
+        const successAlert = document.getElementById('successAlert');
+        const errorMessage = document.getElementById('errorMessage');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        
+        // Hide any previous alerts
+        errorAlert.classList.add('hidden');
+        successAlert.classList.add('hidden');
+        
+        // Remove any previous error styling
+        document.getElementById('email').classList.remove('border-red-500', 'bg-red-50');
+        document.getElementById('password').classList.remove('border-red-500', 'bg-red-50');
+        
+        // Validate email format
+        if (!isValidEmail(email)) {
+            showError('Please enter a valid email address');
+            document.getElementById('email').classList.add('border-red-500', 'bg-red-50');
+            document.getElementById('email').focus();
+            return false;
+        }
+        
+        // Validate password not empty
+        if (!password) {
+            showError('Password is required');
+            document.getElementById('password').classList.add('border-red-500', 'bg-red-50');
+            document.getElementById('password').focus();
+            return false;
+        }
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        btnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Verifying...';
+        submitBtn.classList.add('opacity-90', 'cursor-not-allowed');
+        
+        // Simulate network delay
+        setTimeout(() => {
+            // Check credentials against hardcoded values
+            if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
+                // Success
+                successAlert.classList.remove('hidden');
+                
+                // Store in sessionStorage
+                sessionStorage.setItem('admin_authenticated', 'true');
+                sessionStorage.setItem('admin_email', email);
+                
+                // Also set a cookie
+                document.cookie = "admin_authenticated=true; path=/";
+                
+                // Reset button state
+                submitBtn.disabled = false;
+                btnText.innerHTML = 'Access Admin Panel';
+                submitBtn.classList.remove('opacity-90', 'cursor-not-allowed');
+                
+                // Redirect to admin dashboard
                 setTimeout(() => {
-                    eyeIcon.classList.remove('text-indigo-600');
-                }, 300);
+                    window.location.href = '/admin/dashboard';
+                }, 1500);
             } else {
-                passwordInput.type = 'password';
-                eyeIcon.classList.remove('fa-eye-slash');
-                eyeIcon.classList.add('fa-eye');
-                eyeIcon.classList.add('text-indigo-600');
+                // Error
+                showError('Invalid email or password');
+                
+                // Reset button state
+                submitBtn.disabled = false;
+                btnText.innerHTML = 'Access Admin Panel';
+                submitBtn.classList.remove('opacity-90', 'cursor-not-allowed');
+                
+                // Shake the form
+                document.querySelector('.max-w-sm').classList.add('animate-shake');
                 setTimeout(() => {
-                    eyeIcon.classList.remove('text-indigo-600');
-                }, 300);
+                    document.querySelector('.max-w-sm').classList.remove('animate-shake');
+                }, 500);
             }
-        }
-
-        // Handle admin login
-        function handleAdminLogin(event) {
-            event.preventDefault();
-            
-            // Get form values
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const remember = document.getElementById('remember').checked;
-            
-            // Get alert elements
-            const errorAlert = document.getElementById('errorAlert');
-            const successAlert = document.getElementById('successAlert');
-            const errorMessage = document.getElementById('errorMessage');
-            const submitBtn = document.getElementById('submitBtn');
-            const btnText = document.getElementById('btnText');
-            
-            // Hide any previous alerts
+        }, 800);
+        
+        return false;
+    }
+    
+    // Helper function to show error
+    function showError(message) {
+        const errorAlert = document.getElementById('errorAlert');
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.textContent = message;
+        errorAlert.classList.remove('hidden');
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
             errorAlert.classList.add('hidden');
-            successAlert.classList.add('hidden');
-            
-            // Remove any previous error styling
-            document.getElementById('email').classList.remove('border-red-500', 'bg-red-50');
-            document.getElementById('password').classList.remove('border-red-500', 'bg-red-50');
-            
-            // Validate email format
-            if (!isValidEmail(email)) {
-                showError('Please enter a valid email address');
-                document.getElementById('email').classList.add('border-red-500', 'bg-red-50');
-                document.getElementById('email').focus();
-                return false;
-            }
-            
-            // Validate password not empty
-            if (!password) {
-                showError('Password is required');
-                document.getElementById('password').classList.add('border-red-500', 'bg-red-50');
-                document.getElementById('password').focus();
-                return false;
-            }
-            
-            // Show loading state
-            submitBtn.disabled = true;
-            btnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Verifying...';
-            submitBtn.classList.add('opacity-90', 'cursor-not-allowed');
-            
-            // Simulate network delay (remove in production)
-            setTimeout(() => {
-                // Check credentials against hardcoded values
-                if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
-                    // Success
-                    successAlert.classList.remove('hidden');
-                    
-                    // Store in sessionStorage if remember me is checked
-                    if (remember) {
-                        sessionStorage.setItem('admin_authenticated', 'true');
-                        sessionStorage.setItem('admin_email', email);
-                        sessionStorage.setItem('admin_remember', 'true');
-                    } else {
-                        sessionStorage.setItem('admin_authenticated', 'true');
-                        sessionStorage.setItem('admin_email', email);
-                    }
-                    
-                    // Also set a cookie for additional persistence (optional)
-                    document.cookie = "admin_authenticated=true; path=/";
-                    
-                    // Reset button state
-                    submitBtn.disabled = false;
-                    btnText.innerHTML = 'Access Admin Panel';
-                    submitBtn.classList.remove('opacity-90', 'cursor-not-allowed');
-                    
-                    // Redirect to admin dashboard after 1.5 seconds
-                    setTimeout(() => {
-                        window.location.href = '/admin/dashboard';
-                    }, 1500);
-                } else {
-                    // Error
-                    showError('Invalid email or password');
-                    
-                    // Reset button state
-                    submitBtn.disabled = false;
-                    btnText.innerHTML = 'Access Admin Panel';
-                    submitBtn.classList.remove('opacity-90', 'cursor-not-allowed');
-                    
-                    // Shake the form
-                    document.querySelector('.max-w-sm').classList.add('animate-shake');
-                    setTimeout(() => {
-                        document.querySelector('.max-w-sm').classList.remove('animate-shake');
-                    }, 500);
-                }
-            }, 800); // Simulate network delay
-            
+        }, 5000);
+    }
+    
+    // Email validation function
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+    
+    // Check if already authenticated - FIXED VERSION
+    function checkAuth() {
+        // Get current path
+        const currentPath = window.location.pathname;
+        
+        // Don't redirect if we're on the login page
+        if (currentPath.includes('/admin/login')) {
             return false;
         }
         
-        // Helper function to show error
-        function showError(message) {
-            const errorAlert = document.getElementById('errorAlert');
-            const errorMessage = document.getElementById('errorMessage');
-            errorMessage.textContent = message;
-            errorAlert.classList.remove('hidden');
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                errorAlert.classList.add('hidden');
-            }, 5000);
+        // Check if authenticated
+        const isAuthenticated = sessionStorage.getItem('admin_authenticated') === 'true' || 
+                                document.cookie.includes('admin_authenticated=true');
+        
+        if (!isAuthenticated && !currentPath.includes('/admin/login')) {
+            // Not authenticated and not on login page - redirect to login
+            window.location.href = '/admin/login';
+            return true;
         }
         
-        // Email validation function
-        function isValidEmail(email) {
-            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-        }
+        return false;
+    }
+    
+    // Check if already on dashboard and authenticated
+    function checkDashboardAccess() {
+        const currentPath = window.location.pathname;
+        const isAuthenticated = sessionStorage.getItem('admin_authenticated') === 'true' || 
+                                document.cookie.includes('admin_authenticated=true');
         
-        // Check if already authenticated
-        function checkAuth() {
-            // Check sessionStorage
-            if (sessionStorage.getItem('admin_authenticated') === 'true') {
-                // Redirect to admin dashboard if already logged in
-                window.location.href = '/admin/dashboard';
-                return true;
-            }
-            
-            // Check cookie as backup
-            if (document.cookie.includes('admin_authenticated=true')) {
-                window.location.href = '/admin/dashboard';
-                return true;
-            }
-            
+        // If on dashboard but not authenticated, redirect to login
+        if (currentPath.includes('/admin/dashboard') && !isAuthenticated) {
+            window.location.href = '/admin/login';
             return false;
         }
         
-        // Run check on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Don't auto-redirect if we're already on the login page
-            if (!window.location.pathname.includes('/admin/login')) {
-                checkAuth();
-            }
-            
-            // Add input event listeners to remove error styling
-            document.getElementById('email').addEventListener('input', function() {
-                this.classList.remove('border-red-500', 'bg-red-50');
-                document.getElementById('errorAlert').classList.add('hidden');
-            });
-            
-            document.getElementById('password').addEventListener('input', function() {
-                this.classList.remove('border-red-500', 'bg-red-50');
-                document.getElementById('errorAlert').classList.add('hidden');
-            });
-        });
+        return true;
+    }
+    
+    // Run checks on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Run authentication checks
+        checkAuth();
+        checkDashboardAccess();
         
-        // Prevent form submission on enter key
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && document.activeElement.tagName !== 'BUTTON') {
+        // Add input event listeners to remove error styling
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const errorAlert = document.getElementById('errorAlert');
+        
+        if (emailInput) {
+            emailInput.addEventListener('input', function() {
+                this.classList.remove('border-red-500', 'bg-red-50');
+                if (errorAlert) errorAlert.classList.add('hidden');
+            });
+        }
+        
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function() {
+                this.classList.remove('border-red-500', 'bg-red-50');
+                if (errorAlert) errorAlert.classList.add('hidden');
+            });
+        }
+    });
+    
+    // Prevent form submission on enter key
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && !e.target.closest('button')) {
+            const form = document.getElementById('adminLoginForm');
+            if (form && window.location.pathname.includes('/admin/login')) {
                 e.preventDefault();
                 handleAdminLogin(e);
             }
-        });
-        
-        // Clear auth on logout (if you add a logout button)
-        function logout() {
-            sessionStorage.removeItem('admin_authenticated');
-            sessionStorage.removeItem('admin_email');
-            sessionStorage.removeItem('admin_remember');
-            document.cookie = "admin_authenticated=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            window.location.href = '/admin/login';
         }
-    </script>
+    });
+    
+    // Clear auth on logout
+    function logout() {
+        sessionStorage.removeItem('admin_authenticated');
+        sessionStorage.removeItem('admin_email');
+        document.cookie = "admin_authenticated=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        window.location.href = '/admin/login';
+    }
+</script>
 @endsection
