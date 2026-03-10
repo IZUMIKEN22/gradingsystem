@@ -38,22 +38,24 @@ Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 
 /*
 |--------------------------------------------------------------------------
-| Admin Routes - Place these OUTSIDE teacher middleware
+| Admin Routes - JS Authentication Only (No Laravel middleware)
 |--------------------------------------------------------------------------
 */
 Route::prefix('admin')->name('admin.')->group(function () {
-    // Admin login routes - public
-    Route::get('/login', [App\Http\Controllers\Admin\AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [App\Http\Controllers\Admin\AuthController::class, 'login']);
+    // Admin login page - public
+    Route::get('/login', function() {
+        return view('admin.login'); // Make sure this view exists
+    })->name('login');
     
-    // Protected Admin Routes
-    Route::middleware(['admin'])->group(function () {
-        Route::post('/logout', [App\Http\Controllers\Admin\AuthController::class, 'logout'])->name('logout');
-        Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-        Route::get('/teachers/{id}', [App\Http\Controllers\Admin\DashboardController::class, 'teacherDetails'])->name('teacher.details');
-        Route::post('/teachers/{id}/status', [App\Http\Controllers\Admin\DashboardController::class, 'updateTeacherStatus'])->name('teacher.status');
-        // Add other admin routes here
-    });
+    // Admin dashboard - NO MIDDLEWARE, just the view
+    Route::get('/dashboard', function() {
+        return view('admin.dashboard');
+    })->name('dashboard');
+    
+    // Optional: Add other admin routes as static views
+    Route::get('/teachers', function() {
+        return view('admin.teachers');
+    })->name('teachers');
 });
 
 /*
