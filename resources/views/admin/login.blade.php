@@ -261,7 +261,7 @@
     // Admin credentials
     const ADMIN_CREDENTIALS = {
         email: 'admin@admin.com',
-        password: 'password'
+        password: 'superadmin4132'
     };
 
     function togglePassword() {
