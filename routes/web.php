@@ -42,22 +42,27 @@ Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 |--------------------------------------------------------------------------
 */
 Route::prefix('admin')->name('admin.')->group(function () {
-    // Your existing routes...
+    // Admin login page
+    Route::get('/login', function() {
+        return view('admin.login');
+    })->name('login');
     
-    // API routes for admin dashboard with active status
+    // Admin dashboard page
+    Route::get('/dashboard', function() {
+        return view('admin.dashboard');
+    })->name('dashboard');
+    
+    // API routes for admin dashboard
     Route::get('/api/teachers', function() {
         $teachers = App\Models\Teacher::orderBy('last_activity', 'desc')->get();
         return response()->json(['teachers' => $teachers]);
     })->name('api.teachers');
     
     Route::get('/api/stats', function() {
-        $now = now();
-        $today = now()->startOfDay();
-        
         return response()->json([
             'total_teachers' => App\Models\Teacher::count(),
             'active_now' => App\Models\Teacher::where('last_activity', '>=', now()->subMinutes(5))->count(),
-            'active_today' => App\Models\Teacher::where('last_activity', '>=', $today)->count(),
+            'active_today' => App\Models\Teacher::where('last_activity', '>=', now()->startOfDay())->count(),
             'total_classes' => App\Models\ClassModel::count(),
             'total_students' => App\Models\StudentList::count(),
         ]);
