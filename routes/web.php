@@ -52,21 +52,40 @@ Route::prefix('admin')->name('admin.')->group(function () {
         return view('admin.dashboard');
     })->name('dashboard');
     
-    // API routes for admin dashboard
     Route::get('/api/teachers', function() {
+    try {
+        // Check if the last_activity column exists
         $teachers = App\Models\Teacher::orderBy('last_activity', 'desc')->get();
-        return response()->json(['teachers' => $teachers]);
-    })->name('api.teachers');
-    
-    Route::get('/api/stats', function() {
         return response()->json([
+            'success' => true,
+            'teachers' => $teachers
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+})->name('api.teachers');
+
+Route::get('/api/stats', function() {
+    try {
+        return response()->json([
+            'success' => true,
             'total_teachers' => App\Models\Teacher::count(),
             'active_now' => App\Models\Teacher::where('last_activity', '>=', now()->subMinutes(5))->count(),
             'active_today' => App\Models\Teacher::where('last_activity', '>=', now()->startOfDay())->count(),
             'total_classes' => App\Models\ClassModel::count(),
             'total_students' => App\Models\StudentList::count(),
         ]);
-    })->name('api.stats');
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+})->name('api.stats');
 }); 
 /*
 |--------------------------------------------------------------------------

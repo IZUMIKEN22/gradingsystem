@@ -123,14 +123,30 @@
                         <table class="min-w-full divide-y divide-white/5">
                             <thead class="bg-white/5">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">ID</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Email</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Username</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Last Activity</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Joined</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        ID</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        Name</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        Email</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        Username</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        Status</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        Last Activity</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        Joined</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="teachersTableBody" class="divide-y divide-white/5">
@@ -168,7 +184,7 @@
             // Load teachers data
             loadTeachers();
             loadStats();
-            
+
             // Auto-refresh every 30 seconds
             setInterval(() => {
                 loadTeachers();
@@ -185,21 +201,21 @@
                 document.getElementById('noTeachersMessage').classList.add('hidden');
 
                 // Fetch teachers from your API endpoint
-                const response = await fetch('/api/admin/teachers', {
+                const response = await fetch('/admin/api/teachers', {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json'
                     }
                 });
 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch teachers');
-                }
-
                 const data = await response.json();
 
                 // Hide loading spinner
                 document.getElementById('loadingSpinner').classList.add('hidden');
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to fetch teachers');
+                }
 
                 if (data.teachers && data.teachers.length > 0) {
                     // Show table and populate data
@@ -208,6 +224,11 @@
                 } else {
                     // Show no teachers message
                     document.getElementById('noTeachersMessage').classList.remove('hidden');
+                    document.getElementById('noTeachersMessage').innerHTML = `
+                    <i class="fas fa-users text-5xl text-gray-600 mb-3"></i>
+                    <p class="text-gray-400 text-lg">No teachers found</p>
+                    <p class="text-gray-500 text-sm mt-1">Teachers will appear here once they register</p>
+                `;
                 }
 
             } catch (error) {
@@ -215,10 +236,13 @@
                 document.getElementById('loadingSpinner').classList.add('hidden');
                 document.getElementById('noTeachersMessage').classList.remove('hidden');
                 document.getElementById('noTeachersMessage').innerHTML = `
-                    <i class="fas fa-exclamation-circle text-5xl text-red-500 mb-3"></i>
-                    <p class="text-red-400 text-lg">Error loading teachers</p>
-                    <p class="text-gray-500 text-sm mt-1">Please try refreshing the page</p>
-                `;
+                <i class="fas fa-exclamation-circle text-5xl text-red-500 mb-3"></i>
+                <p class="text-red-400 text-lg">Error loading teachers</p>
+                <p class="text-gray-500 text-sm mt-1">${error.message}</p>
+                <button onclick="loadTeachers()" class="mt-4 px-4 py-2 bg-indigo-600/20 text-indigo-300 rounded-lg hover:bg-indigo-600/40 transition-colors">
+                    <i class="fas fa-sync-alt mr-2"></i>Try Again
+                </button>
+            `;
             }
         }
 
@@ -233,19 +257,19 @@
 
                 // Format dates
                 const joinedDate = teacher.created_at ? new Date(teacher.created_at).toLocaleDateString() : 'N/A';
-                
+
                 // Handle last activity
                 let lastActivityText = 'Never';
                 let isOnline = false;
-                
+
                 if (teacher.last_activity) {
                     const lastActivity = new Date(teacher.last_activity);
                     const now = new Date();
                     const diffMinutes = Math.floor((now - lastActivity) / (1000 * 60));
-                    
+
                     // Online if active in last 5 minutes
                     isOnline = diffMinutes < 5;
-                    
+
                     if (diffMinutes < 1) {
                         lastActivityText = 'Just now';
                     } else if (diffMinutes < 60) {
@@ -261,22 +285,22 @@
                     '<span class="px-2 py-1 bg-gray-600/20 text-gray-400 rounded-full text-xs flex items-center gap-1"><span class="w-2 h-2 bg-gray-400 rounded-full"></span> Offline</span>';
 
                 row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${teacher.id || 'N/A'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${teacher.name || 'N/A'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${teacher.email || 'N/A'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${teacher.username || 'N/A'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${lastActivityText}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${joinedDate}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <button onclick="viewTeacherDetails(${teacher.id})" class="text-indigo-400 hover:text-indigo-300 mr-3" title="View Details">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button onclick="deleteTeacher(${teacher.id})" class="text-red-400 hover:text-red-300" title="Delete Teacher">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${teacher.id || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${teacher.name || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${teacher.email || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${teacher.username || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${lastActivityText}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${joinedDate}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <button onclick="viewTeacherDetails(${teacher.id})" class="text-indigo-400 hover:text-indigo-300 mr-3" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="deleteTeacher(${teacher.id})" class="text-red-400 hover:text-red-300" title="Delete Teacher">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
 
                 tbody.appendChild(row);
             });
