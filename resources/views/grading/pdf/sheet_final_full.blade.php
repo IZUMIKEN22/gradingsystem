@@ -126,7 +126,7 @@
                     <td style="width: 140px;" class="bold tdth">Lab</td>
                     <td class="tdth"></td>
                     <td class="bold tdth">Credits</td>
-                    <td class="tdth">{{ $formattedCredits }}</td>
+                    <td class="tdth">{{ $credits ?? '3.0' }}</td>
                     <td class="bold tdth">Date & Time</td>
                     <td class="tdth">{{ $schedule_time }}</td>
                     <td class="tdth">{{ $schedule_date }}</td>
