@@ -43,6 +43,8 @@ class GradingSheetController extends Controller
         $schedule_date = $class->schedule_date;
         $name = $class->teacher->name ?? 'N/A';
         $academic_year = $class->academicYear->academic_year ?? 'N/A';
+        // Add credits
+        $credits = $class->credits ?? 3.0;
 
         return view('grading.sheet_midterm', compact(
             'students',
@@ -57,7 +59,8 @@ class GradingSheetController extends Controller
             'schedule_time',
             'schedule_date',
             'name',
-            'academic_year'
+            'academic_year',
+            'credits' // Added credits
         ));
     }
 
@@ -87,6 +90,8 @@ class GradingSheetController extends Controller
         $schedule_date = $class->schedule_date;
         $name = $class->teacher->name ?? 'N/A';
         $academic_year = $class->academicYear->academic_year ?? 'N/A';
+        // Add credits
+        $credits = $class->credits ?? 3.0;
 
         return view('grading.sheet_final', compact(
             'students',
@@ -101,7 +106,8 @@ class GradingSheetController extends Controller
             'schedule_time',
             'schedule_date',
             'name',
-            'academic_year'
+            'academic_year',
+            'credits' // Added credits
         ));
     }
 
@@ -150,6 +156,8 @@ class GradingSheetController extends Controller
         $schedule_date = $class->schedule_date;
         $name = $class->teacher->name ?? 'N/A';
         $academic_year = $class->academicYear->academic_year ?? 'N/A';
+        // Add credits
+        $credits = $class->credits ?? 3.0;
 
         return view('grading.sheet', compact(
             'students',
@@ -170,7 +178,8 @@ class GradingSheetController extends Controller
             'schedule_time',
             'schedule_date',
             'name',
-            'academic_year'
+            'academic_year',
+            'credits' // Added credits
         ));
     }
 
@@ -233,6 +242,7 @@ class GradingSheetController extends Controller
                 'schedule_date' => $class->schedule_date,
                 'name' => $class->teacher->name ?? 'N/A',
                 'academic_year' => $class->academicYear->academic_year ?? 'N/A',
+                'credits' => $class->credits ?? 3.0, // Added credits
             ];
 
             // Add images if they exist (with error handling)
@@ -338,6 +348,7 @@ class GradingSheetController extends Controller
                 'schedule_date' => $class->schedule_date,
                 'name' => $class->teacher->name ?? 'N/A',
                 'academic_year' => $class->academicYear->academic_year ?? 'N/A',
+                'credits' => $class->credits ?? 3.0, // Added credits
             ];
 
             // Add images if they exist (with error handling)
@@ -383,6 +394,7 @@ class GradingSheetController extends Controller
             ], 500);
         }
     }
+    
     public function downloadFull($class_id)
     {
         try {
@@ -442,6 +454,7 @@ class GradingSheetController extends Controller
                 'schedule_date' => $class->schedule_date,
                 'name' => $class->teacher->name ?? 'N/A',
                 'academic_year' => $class->academicYear->academic_year ?? 'N/A',
+                'credits' => $class->credits ?? 3.0, // Added credits
             ];
 
             // Add images if they exist

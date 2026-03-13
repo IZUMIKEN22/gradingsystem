@@ -1,5 +1,3 @@
-@extends('layout')
-
 @section('title', 'Admin Login - Grading System')
 
 @section('content')

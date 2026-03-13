@@ -74,6 +74,7 @@ public function classList(Request $request)
             'section' => 'required',
             'subject_code' => 'required',
             'subject_description' => 'required',
+            'credits' => 'required|numeric|min:1|max:5',
             'schedule_date' => 'required',
             'schedule_time' => 'required',
         ]);
@@ -100,6 +101,7 @@ public function classList(Request $request)
             'section' => $request->section,
             'subject_code' => $request->subject_code,
             'subject_description' => $request->subject_description,
+            'credits' => $request->credits,
             'schedule_date' => $request->schedule_date,
             'schedule_time' => $request->schedule_time,
         ]);
@@ -114,45 +116,60 @@ public function classList(Request $request)
             ->where('teacher_id', session('teacher_id'))
             ->firstOrFail();
 
-        return view('class_edit', compact('class'));
+        // Add these lines to get data for dropdowns
+        $academicYears = AcademicYear::orderBy('academic_year', 'desc')->get();
+        $departments = Department::all();
+        $blocks = \App\Models\Block::where('department_id', $class->department_id)->get();
+
+        return view('class_edit', compact('class', 'academicYears', 'departments', 'blocks'));
     }
 
     public function update(Request $request, $id)
-    {
-        $request->validate([
-            'semester' => 'required',
-            'department_id' => 'required|exists:departments,id',
-            'block_id' => 'required|exists:blocks,id',
-            'section' => 'required',
-            'subject_code' => 'required',
-            'subject_description' => 'required',
+{
+    $request->validate([
+        'academic_year_id' => 'required|exists:academic_years,id', // Add this
+        'semester' => 'required',
+        'department_id' => 'required|exists:departments,id',
+        'block_id' => 'required|exists:blocks,id',
+        'section' => 'required',
+        'subject_code' => 'required',
+        'subject_description' => 'required',
+        'credits' => 'required|numeric|min:1|max:5', // Fix min/max values
+        'schedule_date' => 'required', // Add this
+        'schedule_time' => 'required', // Add this
+    ]);
+
+    $exists = ClassModel::where('teacher_id', session('teacher_id'))
+        ->where('academic_year_id', $request->academic_year_id) // Add this
+        ->where('semester', $request->semester) // Add this
+        ->where('department_id', $request->department_id)
+        ->where('block_id', $request->block_id)
+        ->where('section', $request->section)
+        ->where('subject_code', $request->subject_code)
+        ->where('class_id', '!=', $id)
+        ->exists();
+
+    if ($exists) {
+        return back()->with('error', 'This class already exists!');
+    }
+
+    ClassModel::where('class_id', $id)
+        ->where('teacher_id', session('teacher_id'))
+        ->update([
+            'academic_year_id' => $request->academic_year_id, // Add this
+            'semester' => $request->semester,
+            'department_id' => $request->department_id,
+            'block_id' => $request->block_id,
+            'section' => $request->section,
+            'subject_code' => $request->subject_code,
+            'subject_description' => $request->subject_description,
+            'credits' => $request->credits,
+            'schedule_date' => $request->schedule_date, // Add this
+            'schedule_time' => $request->schedule_time, // Add this
         ]);
 
-        $exists = ClassModel::where('teacher_id', session('teacher_id'))
-            ->where('department_id', $request->department_id)
-            ->where('block_id', $request->block_id)
-            ->where('section', $request->section)
-            ->where('subject_code', $request->subject_code)
-            ->where('class_id', '!=', $id)
-            ->exists();
-
-        if ($exists) {
-            return back()->with('error', 'This class already exists!');
-        }
-
-        ClassModel::where('class_id', $id)
-            ->where('teacher_id', session('teacher_id'))
-            ->update([
-                'semester' => $request->semester,
-                'department_id' => $request->department_id,
-                'block_id' => $request->block_id,
-                'section' => $request->section,
-                'subject_code' => $request->subject_code,
-                'subject_description' => $request->subject_description,
-            ]);
-
-        return redirect()->route('classes.index')->with('success', 'Class Updated');
-    }
+    return redirect()->route('classes.index')->with('success', 'Class Updated Successfully');
+}
 
 
     public function destroy($id)
