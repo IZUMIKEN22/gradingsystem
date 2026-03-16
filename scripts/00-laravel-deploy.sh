@@ -12,7 +12,7 @@ echo "Caching views..."
 php artisan view:cache
 
 echo "Running migrations..."
-php artisan migrate --force
+php artisan migrate:fresh --force
 
 echo "Running seeders..."  # ADD THIS
 php artisan db:seed --force  # ADD THIS
