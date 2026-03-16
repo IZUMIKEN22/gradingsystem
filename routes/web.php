@@ -44,8 +44,13 @@ Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 Route::prefix('admin')->name('admin.')->group(function () {
     // Admin login page
     Route::get('/login', function() {
+    // Simple test to see if we can render a basic view
+    try {
         return view('admin.login');
-    })->name('login');
+    } catch (\Exception $e) {
+        return "Error: " . $e->getMessage();
+    }
+})->name('login');
     
     // Admin dashboard page
     Route::get('/dashboard', function() {

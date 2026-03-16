@@ -1,3 +1,5 @@
+@extends('layouts.admin')
+
 @section('title', 'Admin Login - Grading System')
 
 @section('content')
@@ -200,7 +202,7 @@
                                 <p class="text-xs font-semibold text-gray-500 mb-2">Demo Credentials:</p>
                                 <div class="space-y-1 text-xs text-gray-600">
                                     <p><span class="font-medium">Email:</span> admin@admin.com</p>
-                                    <p><span class="font-medium">Password:</span> password</p>
+                                    <p><span class="font-medium">Password:</span> superadmin4132</p>
                                 </div>
                             </div>
                         </div>
