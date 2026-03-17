@@ -1,9 +1,5 @@
 <?php
 
-Route::get('/test', function() {
-    return 'Laravel is working!';
-});
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GradingCriteriaController;
 use App\Http\Controllers\AssessmentController;
@@ -15,6 +11,7 @@ use App\Http\Controllers\StudentsController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\Admin\AdminTeacherController; // This is already imported
 
 /*
 |--------------------------------------------------------------------------
@@ -44,54 +41,46 @@ Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 Route::prefix('admin')->name('admin.')->group(function () {
     // Admin login page
     Route::get('/login', function() {
-    // Simple test to see if we can render a basic view
-    try {
-        return view('admin.login');
-    } catch (\Exception $e) {
-        return "Error: " . $e->getMessage();
-    }
-})->name('login');
+        try {
+            return view('admin.login');
+        } catch (\Exception $e) {
+            return "Error: " . $e->getMessage();
+        }
+    })->name('login');
     
     // Admin dashboard page
     Route::get('/dashboard', function() {
         return view('admin.dashboard');
     })->name('dashboard');
     
-    Route::get('/api/teachers', function() {
-    try {
-        // Check if the last_activity column exists
-        $teachers = App\Models\Teacher::orderBy('last_activity', 'desc')->get();
-        return response()->json([
-            'success' => true,
-            'teachers' => $teachers
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ], 500);
-    }
-})->name('api.teachers');
+    // Teacher registration page
+    Route::get('/teachers/register', [AdminTeacherController::class, 'create'])->name('teachers.register');
+    
+    // Teacher details page
+    Route::get('/teachers/{id}', [AdminTeacherController::class, 'show'])->name('teachers.show');
+    
+    // API Routes for admin
+    Route::prefix('api')->name('api.')->group(function () {
+        // Get teachers list - using controller
+        Route::get('/teachers', [AdminTeacherController::class, 'index'])->name('teachers');
+        
+        // Get teacher details - using controller
+        Route::get('/teachers/{id}', [AdminTeacherController::class, 'show'])->name('teachers.details');
+        
+        // Delete teacher - using controller
+        Route::delete('/teachers/{id}', [AdminTeacherController::class, 'destroy'])->name('teachers.destroy');
+        
+        // Register teacher - using controller
+        Route::post('/teachers/register', [AdminTeacherController::class, 'store'])->name('teachers.register');
+        
+        // Get dashboard stats - using controller
+        Route::get('/stats', [AdminTeacherController::class, 'getStats'])->name('stats');
+        
+        // Update teacher activity - using controller
+        Route::post('/teachers/{id}/activity', [AdminTeacherController::class, 'updateActivity'])->name('teachers.activity');
+    });
+});
 
-Route::get('/api/stats', function() {
-    try {
-        return response()->json([
-            'success' => true,
-            'total_teachers' => App\Models\Teacher::count(),
-            'active_now' => App\Models\Teacher::where('last_activity', '>=', now()->subMinutes(5))->count(),
-            'active_today' => App\Models\Teacher::where('last_activity', '>=', now()->startOfDay())->count(),
-            'total_classes' => App\Models\ClassModel::count(),
-            'total_students' => App\Models\StudentList::count(),
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage()
-        ], 500);
-    }
-})->name('api.stats');
-}); 
 /*
 |--------------------------------------------------------------------------
 | Protected teacher routes

@@ -17,6 +17,12 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-4">
+                        <!-- Add Teacher Button in Navigation -->
+                        <a href="/admin/teachers/register" 
+                            class="px-4 py-2 bg-green-600/20 hover:bg-green-600/40 text-green-300 rounded-lg transition-all duration-200 flex items-center gap-2">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Add Teacher</span>
+                        </a>
                         <span id="adminEmail" class="text-sm text-gray-300"></span>
                         <button onclick="logout()"
                             class="px-4 py-2 bg-red-600/20 hover:bg-red-600/40 text-red-300 rounded-lg transition-all duration-200 flex items-center gap-2">
@@ -36,7 +42,7 @@
                 <p class="text-gray-400">You have successfully logged in to the admin panel.</p>
             </div>
 
-            <!-- Stats Cards - Updated with Active Now -->
+            <!-- Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
                 <div class="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
                     <div class="flex items-center justify-between mb-4">
@@ -97,6 +103,12 @@
                         <p class="text-sm text-gray-400">Real-time online status with last activity</p>
                     </div>
                     <div class="flex items-center gap-3">
+                        <!-- Add Teacher Button in List Header -->
+                        <a href="/admin/teachers/register" 
+                            class="px-3 py-1.5 bg-green-600/20 hover:bg-green-600/40 text-green-300 rounded-lg transition-all duration-200 flex items-center gap-2">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Add New Teacher</span>
+                        </a>
                         <span class="flex items-center gap-2 text-xs text-gray-400">
                             <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> Online Now
                         </span>
@@ -123,30 +135,14 @@
                         <table class="min-w-full divide-y divide-white/5">
                             <thead class="bg-white/5">
                                 <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        ID</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Name</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Email</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Username</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Status</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Last Activity</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Joined</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Actions</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Email</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Username</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Last Activity</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Joined</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="teachersTableBody" class="divide-y divide-white/5">
@@ -156,11 +152,16 @@
                     </div>
                 </div>
 
-                <!-- No Teachers Message -->
+                <!-- No Teachers Message with Add Button -->
                 <div id="noTeachersMessage" class="hidden text-center py-12">
                     <i class="fas fa-users text-5xl text-gray-600 mb-3"></i>
                     <p class="text-gray-400 text-lg">No teachers found</p>
-                    <p class="text-gray-500 text-sm mt-1">Teachers will appear here once they register</p>
+                    <p class="text-gray-500 text-sm mt-1">Get started by adding your first teacher</p>
+                    <a href="/admin/teachers/register" 
+                        class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-green-600/20 hover:bg-green-600/40 text-green-300 rounded-lg transition-all duration-200">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Add Your First Teacher</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -224,11 +225,6 @@
                 } else {
                     // Show no teachers message
                     document.getElementById('noTeachersMessage').classList.remove('hidden');
-                    document.getElementById('noTeachersMessage').innerHTML = `
-                    <i class="fas fa-users text-5xl text-gray-600 mb-3"></i>
-                    <p class="text-gray-400 text-lg">No teachers found</p>
-                    <p class="text-gray-500 text-sm mt-1">Teachers will appear here once they register</p>
-                `;
                 }
 
             } catch (error) {
@@ -236,13 +232,13 @@
                 document.getElementById('loadingSpinner').classList.add('hidden');
                 document.getElementById('noTeachersMessage').classList.remove('hidden');
                 document.getElementById('noTeachersMessage').innerHTML = `
-                <i class="fas fa-exclamation-circle text-5xl text-red-500 mb-3"></i>
-                <p class="text-red-400 text-lg">Error loading teachers</p>
-                <p class="text-gray-500 text-sm mt-1">${error.message}</p>
-                <button onclick="loadTeachers()" class="mt-4 px-4 py-2 bg-indigo-600/20 text-indigo-300 rounded-lg hover:bg-indigo-600/40 transition-colors">
-                    <i class="fas fa-sync-alt mr-2"></i>Try Again
-                </button>
-            `;
+                    <i class="fas fa-exclamation-circle text-5xl text-red-500 mb-3"></i>
+                    <p class="text-red-400 text-lg">Error loading teachers</p>
+                    <p class="text-gray-500 text-sm mt-1">${error.message}</p>
+                    <button onclick="loadTeachers()" class="mt-4 px-4 py-2 bg-indigo-600/20 text-indigo-300 rounded-lg hover:bg-indigo-600/40 transition-colors">
+                        <i class="fas fa-sync-alt mr-2"></i>Try Again
+                    </button>
+                `;
             }
         }
 
@@ -285,22 +281,22 @@
                     '<span class="px-2 py-1 bg-gray-600/20 text-gray-400 rounded-full text-xs flex items-center gap-1"><span class="w-2 h-2 bg-gray-400 rounded-full"></span> Offline</span>';
 
                 row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${teacher.id || 'N/A'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${teacher.name || 'N/A'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${teacher.email || 'N/A'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${teacher.username || 'N/A'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${lastActivityText}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${joinedDate}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <button onclick="viewTeacherDetails(${teacher.id})" class="text-indigo-400 hover:text-indigo-300 mr-3" title="View Details">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button onclick="deleteTeacher(${teacher.id})" class="text-red-400 hover:text-red-300" title="Delete Teacher">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    `;
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${teacher.id || teacher.teacher_id || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${teacher.name || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${teacher.email || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${teacher.username || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${lastActivityText}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${joinedDate}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <button onclick="viewTeacherDetails(${teacher.id || teacher.teacher_id})" class="text-indigo-400 hover:text-indigo-300 mr-3" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="deleteTeacher(${teacher.id || teacher.teacher_id})" class="text-red-400 hover:text-red-300" title="Delete Teacher">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
 
                 tbody.appendChild(row);
             });
@@ -309,7 +305,7 @@
         // Load dashboard statistics
         async function loadStats() {
             try {
-                const response = await fetch('/api/admin/stats', {
+                const response = await fetch('/admin/api/stats', {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json'
@@ -348,25 +344,28 @@
             }
 
             try {
-                const response = await fetch(`/api/admin/teachers/${teacherId}`, {
+                const response = await fetch(`/admin/api/teachers/${teacherId}`, {
                     method: 'DELETE',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
                     }
                 });
 
-                if (response.ok) {
-                    // Reload teachers
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    alert('Teacher deleted successfully');
                     loadTeachers();
                     loadStats();
                 } else {
-                    alert('Failed to delete teacher');
+                    alert(data.error || 'Failed to delete teacher');
                 }
             } catch (error) {
                 console.error('Error deleting teacher:', error);
-                alert('Error deleting teacher');
+                alert('Error deleting teacher. Please try again.');
             }
         }
 

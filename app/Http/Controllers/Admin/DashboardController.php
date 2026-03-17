@@ -113,4 +113,29 @@ class DashboardController extends Controller
             'message' => 'Teacher status updated successfully'
         ]);
     }
+
+    // Add this method to your existing DashboardController
+
+public function destroy($id)
+{
+    try {
+        $teacher = Teacher::findOrFail($id);
+        
+        // Optional: Delete related records first if needed
+        // $teacher->classes()->delete(); // If you want to delete all classes associated with teacher
+        
+        $teacher->delete();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Teacher deleted successfully'
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error deleting teacher: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }
