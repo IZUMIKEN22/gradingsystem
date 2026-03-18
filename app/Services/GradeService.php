@@ -36,13 +36,20 @@ class GradeService {
     // -------------------------------
     public function computePartialGrade($student_id, $class_id, $type){
         $criteria = GradingCriteria::where('class_id', $class_id)->get();
-        $final = 0;
+        
+        $totalPercentage = 0;
+        $weightedSum = 0;
 
         foreach($criteria as $c){
             // Only get assessments of the correct type
             $assessments = $c->assessments()
                              ->where('type', $type) // 'midterm' or 'final'
                              ->get();
+
+            // Skip if no assessments of this type in this criterion
+            if ($assessments->isEmpty()) {
+                continue;
+            }
 
             $studentTotal = 0;
             $highestTotal = 0;
@@ -56,11 +63,25 @@ class GradeService {
             }
 
             if($highestTotal > 0){
-                $componentGrade = ($studentTotal / $highestTotal) * $c->percentage;
-                $final += $componentGrade;
+                // Calculate the percentage score for this criterion
+                $criterionScore = ($studentTotal / $highestTotal) * 100;
+                
+                // Add to weighted sum (using the criterion's percentage weight)
+                $weightedSum += $criterionScore * ($c->percentage / 100);
+                $totalPercentage += $c->percentage;
             }
         }
 
-        return round($final, 2);
+        // If we have weighted components, calculate the final grade
+        if ($totalPercentage > 0) {
+            // The grade is the weighted average, scaled to 100%
+            // This ensures that if totalPercentage is less than 100%, 
+            // we still get a grade out of 100
+            $finalGrade = ($weightedSum / $totalPercentage) * 100;
+            return round($finalGrade, 2);
+        }
+
+        // Return null if no assessments found for this term
+        return null;
     }
 }
