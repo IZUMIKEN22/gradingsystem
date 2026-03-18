@@ -300,13 +300,11 @@ class GradingSheetController extends Controller
                 \Log::error('Class not found: ' . $class_id);
                 return response()->json(['error' => 'Class not found'], 404);
             }
-            \Log::info('Class found: ' . $class->subject_code);
 
             // Check if students exist
             $students = StudentList::where('class_id', $class_id)
                 ->orderBy('student_name')
                 ->get();
-            \Log::info('Students found: ' . $students->count());
 
             if ($students->isEmpty()) {
                 return response()->json(['error' => 'No students in this class'], 404);
@@ -316,26 +314,22 @@ class GradingSheetController extends Controller
             foreach ($students as $student) {
                 $student->final_grade = $this->gradeService
                     ->computePartialGrade($student->id, $class_id, 'final');
+
+                // Ensure we have a numeric value
+                if ($student->final_grade === null) {
+                    $student->final_grade = 0;
+                }
             }
 
-            // Check if view exists
-            $viewPath = 'grading.pdf.sheet_final_full';
-            if (!view()->exists($viewPath)) {
-                \Log::error('View not found: ' . $viewPath);
-                return response()->json(['error' => 'PDF view not found'], 500);
-            }
-            \Log::info('View exists: ' . $viewPath);
-
-            // Check images
-            $headerPath = public_path('images/header.jpg');
-            $footerPath = public_path('images/footer.jpg');
-
-            \Log::info('Header image exists: ' . (file_exists($headerPath) ? 'Yes' : 'No'));
-            \Log::info('Footer image exists: ' . (file_exists($footerPath) ? 'Yes' : 'No'));
+            // Calculate statistics based on final grade
+            $passed = $students->where('final_grade', '>=', 75)->count();
+            $failed = $students->where('final_grade', '<', 75)->count();
 
             // Prepare data for view
             $data = [
                 'students' => $students,
+                'passed' => $passed,
+                'failed' => $failed,
                 'class_id' => $class_id,
                 'subject_code' => $class->subject_code,
                 'subject_description' => $class->subject_description,
@@ -348,33 +342,23 @@ class GradingSheetController extends Controller
                 'schedule_date' => $class->schedule_date,
                 'name' => $class->teacher->name ?? 'N/A',
                 'academic_year' => $class->academicYear->academic_year ?? 'N/A',
-                'credits' => $class->credits ?? 3.0, // Added credits
+                'credits' => $class->credits ?? 3.0,
             ];
 
-            // Add images if they exist (with error handling)
-            try {
-                if (file_exists($headerPath) && is_readable($headerPath)) {
-                    $data['headerBase64'] = 'data:image/jpeg;base64,' . base64_encode(file_get_contents($headerPath));
-                } else {
-                    $data['headerBase64'] = null;
-                    \Log::warning('Header image not found or not readable');
-                }
+            // Add images
+            $headerPath = public_path('images/header.jpg');
+            $footerPath = public_path('images/footer.jpg');
 
-                if (file_exists($footerPath) && is_readable($footerPath)) {
-                    $data['footerBase64'] = 'data:image/jpeg;base64,' . base64_encode(file_get_contents($footerPath));
-                } else {
-                    $data['footerBase64'] = null;
-                    \Log::warning('Footer image not found or not readable');
-                }
-            } catch (\Exception $e) {
-                \Log::error('Error loading images: ' . $e->getMessage());
-                $data['headerBase64'] = null;
-                $data['footerBase64'] = null;
+            if (file_exists($headerPath)) {
+                $data['headerBase64'] = 'data:image/jpeg;base64,' . base64_encode(file_get_contents($headerPath));
+            }
+            if (file_exists($footerPath)) {
+                $data['footerBase64'] = 'data:image/jpeg;base64,' . base64_encode(file_get_contents($footerPath));
             }
 
             \Log::info('Generating Final PDF...');
 
-            $pdf = PDF::loadView($viewPath, $data)
+            $pdf = PDF::loadView('grading.pdf.sheet_final_full', $data)
                 ->setPaper([0, 0, 612, 936], 'portrait')
                 ->setOption('dpi', 72);
 
@@ -394,7 +378,7 @@ class GradingSheetController extends Controller
             ], 500);
         }
     }
-    
+
     public function downloadFull($class_id)
     {
         try {
