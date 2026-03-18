@@ -18,7 +18,6 @@ use App\Http\Controllers\Admin\AdminTeacherController; // This is already import
 | Public routes
 |--------------------------------------------------------------------------
 */
-
 Route::post('/academic-years', [AcademicYearController::class, 'store'])
     ->name('academic-years.store');
 

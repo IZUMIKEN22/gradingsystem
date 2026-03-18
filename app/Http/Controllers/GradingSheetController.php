@@ -209,7 +209,7 @@ class GradingSheetController extends Controller
             // Compute midterm grades
             foreach ($students as $student) {
                 $student->midterm_grade = $this->gradeService
-                    ->computePartialGrade($student->id, $class_id, 'midterm');
+                    ->computePartialGrade($student->id, $class_id, 'Midterm');
             }
 
             // Check if view exists
@@ -313,7 +313,7 @@ class GradingSheetController extends Controller
             // Compute final grades
             foreach ($students as $student) {
                 $student->final_grade = $this->gradeService
-                    ->computePartialGrade($student->id, $class_id, 'final');
+                    ->computePartialGrade($student->id, $class_id, 'Final');
 
                 // Ensure we have a numeric value
                 if ($student->final_grade === null) {
@@ -403,9 +403,9 @@ class GradingSheetController extends Controller
             // Compute grades for each student
             foreach ($students as $student) {
                 $student->midterm_grade = $this->gradeService
-                    ->computePartialGrade($student->id, $class_id, 'midterm');
+                    ->computePartialGrade($student->id, $class_id, 'Midterm');
                 $student->final_grade = $this->gradeService
-                    ->computePartialGrade($student->id, $class_id, 'final');
+                    ->computePartialGrade($student->id, $class_id, 'Final');
             }
 
             // Check if view exists
