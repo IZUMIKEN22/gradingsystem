@@ -15,27 +15,27 @@ class StudentsController extends Controller
     // List all students (general)
     // --------------------------
     public function index(Request $request)
-{
-    $classId = $request->query('class_id'); // Get class_id from URL
+    {
+        $classId = $request->query('class_id'); // Get class_id from URL
 
-    $students = StudentList::when($classId, function ($query, $classId) {
-        return $query->where('class_id', $classId);
-    })
-    ->orderBy('student_name')
-    ->get();
+        $students = StudentList::when($classId, function ($query, $classId) {
+            return $query->where('class_id', $classId);
+        })
+            ->orderBy('student_name')
+            ->get();
 
-    // ✅ TOTAL STUDENTS COUNT
-    $totalStudents = StudentList::count();
+        // ✅ TOTAL STUDENTS COUNT
+        $totalStudents = StudentList::count();
 
-    return view('students.index', compact('students', 'classId', 'totalStudents'));
-}
+        return view('students.index', compact('students', 'classId', 'totalStudents'));
+    }
 
 
 
     // --------------------------
     // List students per class
     // --------------------------
-   public function studentsPerClass($class_id)
+    public function studentsPerClass($class_id)
     {
         $classId = $class_id;
 
@@ -80,14 +80,11 @@ class StudentsController extends Controller
         return view('students.import', compact('students', 'classId'));
     }
 
-    // --------------------------
-    // Import students from Excel
-    // --------------------------
     public function importStudentList(Request $request)
     {
         $request->validate([
             'file_data' => 'required',
-            'class_id'  => 'required|exists:classes,class_id',
+            'class_id' => 'required|exists:classes,class_id',
         ]);
 
         $classId = $request->class_id;
@@ -112,46 +109,77 @@ class StudentsController extends Controller
 
             $addedCount = 0;
             $skippedCount = 0;
+            $duplicateDetails = [];
+            $differentSubjects = []; // Track students added to different subjects
 
             foreach ($rows as $index => $row) {
-                if ($index < 3) continue; // skip headers
-                if (empty($row[2])) continue; // student_number required
+                if ($index < 3)
+                    continue; // skip headers
+                if (empty($row[2]))
+                    continue; // student_number required
 
-                // Skip duplicates
-                if (StudentList::where('student_number', $row[2])->where('class_id', $classId)->exists()) {
+                // Check if this student is ALREADY in THIS SPECIFIC CLASS (subject)
+                $existingInThisClass = StudentList::where('student_number', $row[2])
+                    ->where('class_id', $classId)
+                    ->exists();
+
+                if ($existingInThisClass) {
                     $skippedCount++;
+                    $duplicateDetails[] = "Student {$row[3]} (ID: {$row[2]}) already in this subject";
                     continue;
                 }
 
+                // Check if student exists in OTHER subjects of the SAME BLOCK (just for info)
+                $existsInOtherSubject = StudentList::where('student_number', $row[2])
+                    ->where('class_id', '!=', $classId)
+                    ->whereHas('class', function ($q) {
+                        // This assumes you have a class relationship
+                        $q->where('block_id', request()->block_id); // You may need to pass block_id
+                    })
+                    ->exists();
+
+                // Create the student record for this subject
                 StudentList::create([
-                    'class_id'       => $classId,
-                    'reg_number'     => $row[1] ?? null,
+                    'class_id' => $classId,
+                    'reg_number' => $row[1] ?? null,
                     'student_number' => $row[2],
-                    'student_name'   => $row[3] ?? null,
-                    'barangay'       => $row[4] ?? null,
-                    'city'           => $row[5] ?? null,
-                    'province'       => $row[6] ?? null,
-                    'date_of_birth'  => $row[7] ?? null,
-                    'sex'            => $row[8] ?? null,
-                    'mobile_number'  => $row[9] ?? null,
-                    'email'          => $row[10] ?? null,
+                    'student_name' => $row[3] ?? null,
+                    'barangay' => $row[4] ?? null,
+                    'city' => $row[5] ?? null,
+                    'province' => $row[6] ?? null,
+                    'date_of_birth' => $row[7] ?? null,
+                    'sex' => $row[8] ?? null,
+                    'mobile_number' => $row[9] ?? null,
+                    'email' => $row[10] ?? null,
                 ]);
+
                 $addedCount++;
+
+                if ($existsInOtherSubject) {
+                    $differentSubjects[] = "Student {$row[3]} (ID: {$row[2]}) also enrolled in other subjects";
+                }
             }
 
             @unlink($tempFile);
 
+            $message = "Import completed: $addedCount added, $skippedCount skipped (already in this subject).";
+
+            if (!empty($duplicateDetails)) {
+                $message .= " " . implode(", ", array_slice($duplicateDetails, 0, 3));
+            }
+
+            if (!empty($differentSubjects)) {
+                $message .= " Note: Some students are enrolled in multiple subjects.";
+            }
+
             return response()->json([
                 'status' => 'success',
-                'message' => "Import completed: $addedCount added, $skippedCount skipped (duplicates)."
+                'message' => $message,
+                'added' => $addedCount,
+                'skipped' => $skippedCount,
+                'multi_subject' => count($differentSubjects)
             ]);
 
-        } catch (\PhpOffice\PhpSpreadsheet\Reader\Exception $e) {
-            \Log::error('Excel Read Error: ', ['exception' => $e]);
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to read Excel file: ' . $e->getMessage()
-            ], 500);
         } catch (\Exception $e) {
             \Log::error('Student Import Error: ', ['exception' => $e]);
             return response()->json([
@@ -164,41 +192,41 @@ class StudentsController extends Controller
     // Return students as JSON (for AJAX)
     // --------------------------
     public function getStudents(Request $request)
-{
-    $classId = $request->query('class_id');
+    {
+        $classId = $request->query('class_id');
 
-    $students = StudentList::where('class_id', $classId)
-        ->with('scores')
-        ->select('id',  'student_number', 'student_name')
-        ->orderBy('student_name')
-        ->get();
+        $students = StudentList::where('class_id', $classId)
+            ->with('scores')
+            ->select('id', 'student_number', 'student_name')
+            ->orderBy('student_name')
+            ->get();
 
-$assessments = Assessment::with('gradingCriteria')
-    ->whereHas('gradingCriteria', function ($q) use ($classId) {
-        $q->where('class_id', $classId);
-    })
-    ->orderBy('id')
-    ->get()
-    ->groupBy(fn($a) => $a->gradingCriteria->component_name)
-    ->map(fn($group) => $group->map(fn($a) => [
-        'id' => $a->id,
-        'title' => $a->title,
-        'highest_score' => $a->highest_score,
-        'type' => $a->type,
-        'criteria' => [
-            'id' => $a->gradingCriteria->id,
-            'component_name' => $a->gradingCriteria->component_name,
-            'percentage' => $a->gradingCriteria->percentage,
-        ]
-    ]));
+        $assessments = Assessment::with('gradingCriteria')
+            ->whereHas('gradingCriteria', function ($q) use ($classId) {
+                $q->where('class_id', $classId);
+            })
+            ->orderBy('id')
+            ->get()
+            ->groupBy(fn($a) => $a->gradingCriteria->component_name)
+            ->map(fn($group) => $group->map(fn($a) => [
+                'id' => $a->id,
+                'title' => $a->title,
+                'highest_score' => $a->highest_score,
+                'type' => $a->type,
+                'criteria' => [
+                    'id' => $a->gradingCriteria->id,
+                    'component_name' => $a->gradingCriteria->component_name,
+                    'percentage' => $a->gradingCriteria->percentage,
+                ]
+            ]));
 
 
 
-    return response()->json([
-        'students' => $students,
-        'assessments' => $assessments
-    ]);
-}
+        return response()->json([
+            'students' => $students,
+            'assessments' => $assessments
+        ]);
+    }
 
 
 
@@ -209,7 +237,7 @@ $assessments = Assessment::with('gradingCriteria')
     {
         $request->validate([
             'student_id' => 'required|exists:student_lists,id',
-            'class_id'   => 'required|exists:classes,class_id',
+            'class_id' => 'required|exists:classes,class_id',
         ]);
 
         $student = StudentList::findOrFail($request->student_id);
@@ -226,7 +254,7 @@ $assessments = Assessment::with('gradingCriteria')
     {
         $request->validate([
             'student_number' => 'required|unique:student_lists,student_number',
-            'student_name'   => 'required',
+            'student_name' => 'required',
         ]);
 
         StudentList::create($request->all());
@@ -256,5 +284,31 @@ $assessments = Assessment::with('gradingCriteria')
         return redirect()->back()->with('success', 'Student deleted successfully.');
     }
 
+    public function getStudentSubjects($student_number, $block_id)
+{
+    $students = StudentList::where('student_number', $student_number)
+        ->whereHas('class', function($q) use ($block_id) {
+            $q->where('block_id', $block_id);
+        })
+        ->with('class')
+        ->get();
     
+    $subjects = $students->map(function($student) {
+        return [
+            'class_id' => $student->class_id,
+            'subject_code' => $student->class->subject_code,
+            'subject_description' => $student->class->subject_description,
+            'grade' => $this->gradeService->computeFinalGrade($student->id, $student->class_id)
+        ];
+    });
+    
+    return response()->json([
+        'student_number' => $student_number,
+        'student_name' => $students->first()->student_name ?? 'N/A',
+        'subjects' => $subjects,
+        'total_subjects' => $subjects->count()
+    ]);
+}
+
+
 }

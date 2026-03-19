@@ -209,7 +209,7 @@
                                         required>
                                         <option value="" disabled selected>Select department</option>
                                         @foreach($departments as $dept)
-                                            <option value="{{ $dept->id }}" data-head="{{ $dept->head }}">
+                                            <option value="{{ $dept->id }}" data-head="{{ $dept->head }}" data-name="{{ $dept->name }}">
                                                 {{ $dept->name }}
                                             </option>
                                         @endforeach
@@ -251,9 +251,16 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         Section <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="text" name="section" placeholder="e.g., A, B, C"
+                                    <select name="section"
                                         class="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition hover:border-indigo-300"
                                         required>
+                                        <option value="" disabled selected>Select section</option>
+                                        <option value="A">Section A</option>
+                                        <option value="B">Section B</option>
+                                        <option value="C">Section C</option>
+                                        <option value="D">Section D</option>
+                                        <option value="N/A">Default (N/A)</option>
+                                    </select>
                                 </div>
                             </div>
 
@@ -277,16 +284,32 @@
                                 </div>
                             </div>
 
-                            <!-- Credits Field (New) -->
-                            <div class="grid md:grid-cols-1 gap-6">
+                            <!-- Credits and Lab Section -->
+                            <div class="grid md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         Credits <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="number" name="credits" placeholder="e.g., 3"
+                                    <select name="credits" id="credits"
                                         class="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition hover:border-indigo-300"
-                                        min="0.5" max="12" step="0.5" required>
-                                    <p class="text-xs text-gray-500 mt-1">Credit units (0.5 increments)</p>
+                                        required>
+                                        <option value="" disabled selected>Select credits</option>
+                                        <option value="2">2 Credits</option>
+                                        <option value="3">3 Credits</option>
+                                        <option value="5">5 Credits</option>
+                                    </select>
+                                </div>
+
+                                <div id="labField" class="hidden">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Lab
+                                    </label>
+                                    <select name="lab"
+                                        class="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition hover:border-indigo-300">
+                                        <option value="" disabled selected>Select lab option</option>
+                                        <option value="3">With Lab (3 units)</option>
+                                        <option value="N/A">Without Lab (N/A)</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -307,10 +330,18 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     Days <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" name="schedule_date" placeholder="e.g., Monday, Wednesday, Friday"
+                                <select name="schedule_date"
                                     class="w-full rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition hover:border-indigo-300"
                                     required>
-                                <p class="text-xs text-gray-500 mt-1">Separate days with commas</p>
+                                    <option value="" disabled selected>Select schedule days</option>
+                                    <option value="MWF">MWF (Monday, Wednesday, Friday)</option>
+                                    <option value="TTH">TTH (Tuesday, Thursday)</option>
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                </select>
                             </div>
 
                             <div>
@@ -347,150 +378,158 @@
         </div>
 
         <!-- Classes Section -->
-<div>
-    <div class="flex items-center justify-between mb-8">
         <div>
-            <h2 class="text-2xl font-bold text-gray-900">Your Classes</h2>
-            <p class="text-gray-600 mt-1" id="filterDescription">Showing all classes</p>
-        </div>
-        <div class="flex items-center gap-4">
-            <span class="text-sm font-medium text-gray-500" id="filteredClassesCount">
-                {{ count($classes) }} total
-            </span>
-            @if($academicYears->isNotEmpty())
-                <button id="clearFilter" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium hidden">
-                    Clear Filter
-                </button>
-            @endif
-        </div>
-    </div>
-
-    <div id="classesContainer">
-        @if($classes->isEmpty())
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center">
-                <div class="max-w-md mx-auto">
-                    <div class="p-3 bg-indigo-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">No Classes Yet</h3>
-                    <p class="text-gray-600 mb-6">Get started by creating your first class above</p>
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">Your Classes</h2>
+                    <p class="text-gray-600 mt-1" id="filterDescription">Showing all classes</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm font-medium text-gray-500" id="filteredClassesCount">
+                        {{ count($classes) }} total
+                    </span>
+                    @if($academicYears->isNotEmpty())
+                        <button id="clearFilter" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium hidden">
+                            Clear Filter
+                        </button>
+                    @endif
                 </div>
             </div>
-        @else
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="classesGrid">
-                @foreach($classes as $class)
-                    <div class="class-card group cursor-pointer bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:border-indigo-300 transition-all duration-300"
-                         data-year-id="{{ $class->academic_year_id }}"
-                         data-year-name="{{ $class->academicYear->academic_year ?? 'Unknown' }}"
-                         onclick="window.location='{{ route('class.students', ['class_id' => $class->class_id]) }}'">
 
-                        <!-- Card Header -->
-                        <div class="mb-4">
-                            <div class="flex justify-between items-start mb-2">
-                                <span
-                                    class="inline-block px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-semibold rounded-full">
-                                    {{ $class->semester }}
-                                </span>
-                                <span class="text-xs text-gray-500 font-medium academic-year-badge">
-                                    {{ $class->academicYear->academic_year ?? 'N/A' }}
-                                </span>
-                            </div>
-
-                            <h3 class="text-lg font-bold text-gray-900 group-hover:text-indigo-700 transition">
-                                {{ $class->subject_code }}
-                            </h3>
-                            <p class="text-gray-600 text-sm mt-1 line-clamp-2">
-                                {{ $class->subject_description }}
-                            </p>
-                            
-                            <!-- Credits Badge (New) -->
-                            <div class="mt-3">
-                                <div class="inline-flex items-center px-3 py-1 rounded-full bg-amber-100">
-                                    <svg class="w-4 h-4 text-amber-600 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span class="font-medium text-amber-900">{{ $class->credits ?? '3' }} Credits</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Class Info -->
-                        <div class="space-y-3 mb-6">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Department</p>
-                                    <p class="font-medium text-gray-900">{{ $class->department->name ?? 'N/A' }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Block</p>
-                                    <p class="font-medium text-gray-900">{{ $class->block->name ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-
-                            <div>
-                                <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Section</p>
-                                <div class="inline-flex items-center px-3 py-1 rounded-full bg-gray-100">
-                                    <span class="font-medium text-gray-900">{{ $class->section }}</span>
-                                </div>
-                            </div>
-
-                            <div class="pt-3 border-t border-gray-100">
-                                <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Schedule</p>
-                                <div class="flex flex-col space-y-2">
-                                    <div class="flex items-center">
-                                        <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                        <span class="font-medium text-gray-900">{{ $class->schedule_date }}</span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <span class="text-gray-700">{{ $class->schedule_time }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="flex gap-3 pt-4 border-t border-gray-100">
-                            <a href="{{ route('classes.edit', $class->class_id) }}" onclick="event.stopPropagation()"
-                                class="flex-1 text-center bg-indigo-50 text-indigo-700 py-2.5 rounded-lg font-medium hover:bg-indigo-100 transition flex items-center justify-center">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div id="classesContainer">
+                @if($classes->isEmpty())
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center">
+                        <div class="max-w-md mx-auto">
+                            <div class="p-3 bg-indigo-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                 </svg>
-                                Edit
-                            </a>
-
-                            <form action="{{ route('classes.destroy', $class->class_id) }}" method="POST"
-                                onclick="event.stopPropagation()" class="flex-none">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" onclick="return confirm('Are you sure you want to delete this class?')"
-                                    class="bg-red-50 text-red-700 px-4 py-2.5 rounded-lg font-medium hover:bg-red-100 transition flex items-center">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                    Delete
-                                </button>
-                            </form>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">No Classes Yet</h3>
+                            <p class="text-gray-600 mb-6">Get started by creating your first class above</p>
                         </div>
                     </div>
-                @endforeach
+                @else
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="classesGrid">
+                        @foreach($classes as $class)
+                            <div class="class-card group cursor-pointer bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:border-indigo-300 transition-all duration-300"
+                                 data-year-id="{{ $class->academic_year_id }}"
+                                 data-year-name="{{ $class->academicYear->academic_year ?? 'Unknown' }}"
+                                 onclick="window.location='{{ route('class.students', ['class_id' => $class->class_id]) }}'">
+
+                                <!-- Card Header -->
+                                <div class="mb-4">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span
+                                            class="inline-block px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-semibold rounded-full">
+                                            {{ $class->semester }}
+                                        </span>
+                                        <span class="text-xs text-gray-500 font-medium academic-year-badge">
+                                            {{ $class->academicYear->academic_year ?? 'N/A' }}
+                                        </span>
+                                    </div>
+
+                                    <h3 class="text-lg font-bold text-gray-900 group-hover:text-indigo-700 transition">
+                                        {{ $class->subject_code }}
+                                    </h3>
+                                    <p class="text-gray-600 text-sm mt-1 line-clamp-2">
+                                        {{ $class->subject_description }}
+                                    </p>
+                                    
+                                    <!-- Credits Badge -->
+                                    <div class="mt-3">
+                                        <div class="inline-flex items-center px-3 py-1 rounded-full bg-amber-100">
+                                            <svg class="w-4 h-4 text-amber-600 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span class="font-medium text-amber-900">{{ $class->credits ?? '3' }} Credits</span>
+                                        </div>
+                                        @if(isset($class->lab) && $class->lab == '3')
+                                            <div class="inline-flex items-center px-3 py-1 rounded-full bg-purple-100 ml-2">
+                                                <svg class="w-4 h-4 text-purple-600 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                                                </svg>
+                                                <span class="font-medium text-purple-900">With Lab (3 units)</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Class Info -->
+                                <div class="space-y-3 mb-6">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Department</p>
+                                            <p class="font-medium text-gray-900">{{ $class->department->name ?? 'N/A' }}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Block</p>
+                                            <p class="font-medium text-gray-900">{{ $class->block->name ?? 'N/A' }}</p>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Section</p>
+                                        <div class="inline-flex items-center px-3 py-1 rounded-full bg-gray-100">
+                                            <span class="font-medium text-gray-900">{{ $class->section }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="pt-3 border-t border-gray-100">
+                                        <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Schedule</p>
+                                        <div class="flex flex-col space-y-2">
+                                            <div class="flex items-center">
+                                                <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                                <span class="font-medium text-gray-900">{{ $class->schedule_date }}</span>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <span class="text-gray-700">{{ $class->schedule_time }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex gap-3 pt-4 border-t border-gray-100">
+                                    <a href="{{ route('classes.edit', $class->class_id) }}" onclick="event.stopPropagation()"
+                                        class="flex-1 text-center bg-indigo-50 text-indigo-700 py-2.5 rounded-lg font-medium hover:bg-indigo-100 transition flex items-center justify-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Edit
+                                    </a>
+
+                                    <form action="{{ route('classes.destroy', $class->class_id) }}" method="POST"
+                                        onclick="event.stopPropagation()" class="flex-none">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" onclick="return confirm('Are you sure you want to delete this class?')"
+                                            class="bg-red-50 text-red-700 px-4 py-2.5 rounded-lg font-medium hover:bg-red-100 transition flex items-center">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
             </div>
-        @endif
-    </div>
-</div>
+        </div>
     </div>
 
     <!-- Custom Scrollbar Styles -->
@@ -498,17 +537,14 @@
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
         }
-
         .custom-scrollbar::-webkit-scrollbar-track {
             background: #f1f1f1;
             border-radius: 10px;
         }
-
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #cbd5e0;
             border-radius: 10px;
         }
-
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
@@ -532,6 +568,23 @@
             transform: scale(0.9);
             transition: opacity 300ms, transform 300ms;
         }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .class-card.hidden {
+            display: none;
+        }
+        .class-card {
+            transition: all 0.3s ease;
+        }
     </style>
 
     <script>
@@ -540,14 +593,35 @@
         const department = document.getElementById('department');
         const headInput = document.getElementById('head_of_department');
         const blockSelect = document.getElementById('block');
+        const labField = document.getElementById('labField');
+        const creditsSelect = document.getElementById('credits');
 
         if (department) {
             department.addEventListener('change', () => {
                 const selectedOption = department.options[department.selectedIndex];
                 const head = selectedOption.getAttribute('data-head') || '';
+                const departmentName = selectedOption.getAttribute('data-name') || '';
+                const departmentId = department.value;
+                
                 headInput.value = head;
 
-                const departmentId = department.value;
+                // Check if it's BSIT/IT department
+                const bsitKeywords = ['BSIT', 'IT', 'Information Technology', 'Computer', 'Computing', 'ICT'];
+                const isBSIT = bsitKeywords.some(keyword => 
+                    departmentName.toUpperCase().includes(keyword.toUpperCase())
+                );
+
+                // Show lab field only for BSIT/IT departments
+                if (isBSIT) {
+                    labField.classList.remove('hidden');
+                    // Set default to "Without Lab" (N/A)
+                    const labSelect = labField.querySelector('select');
+                    if (labSelect) {
+                        labSelect.value = 'N/A';
+                    }
+                } else {
+                    labField.classList.add('hidden');
+                }
 
                 // Clear previous blocks
                 blockSelect.innerHTML = '<option value="" disabled selected>Loading blocks...</option>';
@@ -787,28 +861,6 @@
         
         // Make sure all classes are visible on page load
         filterClassesByYear('all');
-
-        // Add fadeIn animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-            .class-card.hidden {
-                display: none;
-            }
-            .class-card {
-                transition: all 0.3s ease;
-            }
-        `;
-        document.head.appendChild(style);
     });
 </script>
 

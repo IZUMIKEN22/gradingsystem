@@ -2,18 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class StudentList extends Model
 {
-    use HasFactory;
-
-    protected $table = 'student_list'; // make sure table name is correct
-    protected $primaryKey = 'id'; // set your table's primary key
-
+    protected $table = 'student_list';
+    protected $primaryKey = 'id';
+    
     protected $fillable = [
-        'class_id',       // <-- include class_id for your import
+        'class_id',
         'reg_number',
         'student_number',
         'student_name',
@@ -26,13 +23,30 @@ class StudentList extends Model
         'email',
     ];
 
-    // Optional: relationship to class
+    // Relationship to class
     public function class()
     {
         return $this->belongsTo(ClassModel::class, 'class_id', 'class_id');
     }
-    public function scores() {
-        return $this->hasMany(Score::class, 'student_id');
-    }
 
+    // Relationship to scores
+    public function scores()
+    {
+        return $this->hasMany(Score::class, 'student_id', 'id');
+    }
+    
+    // Get all subjects for this student in the same block
+    public function getOtherSubjectsInSameBlock()
+    {
+        if (!$this->class) {
+            return collect();
+        }
+        
+        return self::where('student_number', $this->student_number)
+            ->whereHas('class', function($q) {
+                $q->where('block_id', $this->class->block_id);
+            })
+            ->with('class')
+            ->get();
+    }
 }

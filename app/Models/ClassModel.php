@@ -20,6 +20,7 @@ class ClassModel extends Model
         'subject_code',
         'subject_description',
         'credits',
+        'lab',
         'schedule_date',
         'schedule_time',
     ];
